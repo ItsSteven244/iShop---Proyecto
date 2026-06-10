@@ -6,7 +6,8 @@ import (
 	"github.com/ItsSteven244/iShop---Proyecto/internal/models"
 )
 
-// MemoriaCorrectivo almacena las entidades del módulo correctivo en memoria.
+// MemoriaCorrectivo es el almacén en memoria para todo el módulo correctivo.
+// Tiene slices para órdenes, procesos y evidencias, cada uno con su propio contador de IDs.
 type MemoriaCorrectivo struct {
 	ordenes     []models.OrdenCorrectiva
 	nextOrdenID int
@@ -20,7 +21,7 @@ type MemoriaCorrectivo struct {
 	mu sync.Mutex
 }
 
-// NuevaMemoriaCorrectivo crea un almacén vacío listo para usar.
+// NuevaMemoriaCorrectivo inicializa el storage con los slices vacíos y los IDs desde 1.
 func NuevaMemoriaCorrectivo() *MemoriaCorrectivo {
 	return &MemoriaCorrectivo{
 		ordenes:         []models.OrdenCorrectiva{},
@@ -36,6 +37,7 @@ func NuevaMemoriaCorrectivo() *MemoriaCorrectivo {
 // ORDENES CORRECTIVAS
 // =========================================================
 
+// ListarOrdenes devuelve una copia de todas las órdenes para no exponer el slice interno.
 func (m *MemoriaCorrectivo) ListarOrdenes() []models.OrdenCorrectiva {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -44,6 +46,7 @@ func (m *MemoriaCorrectivo) ListarOrdenes() []models.OrdenCorrectiva {
 	return copia
 }
 
+// BuscarOrdenPorID recorre las órdenes y devuelve la que coincida con el ID, o false si no existe.
 func (m *MemoriaCorrectivo) BuscarOrdenPorID(id int) (models.OrdenCorrectiva, bool) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -55,6 +58,7 @@ func (m *MemoriaCorrectivo) BuscarOrdenPorID(id int) (models.OrdenCorrectiva, bo
 	return models.OrdenCorrectiva{}, false
 }
 
+// CrearOrden le asigna un ID a la orden y la agrega al slice.
 func (m *MemoriaCorrectivo) CrearOrden(o models.OrdenCorrectiva) models.OrdenCorrectiva {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -64,6 +68,7 @@ func (m *MemoriaCorrectivo) CrearOrden(o models.OrdenCorrectiva) models.OrdenCor
 	return o
 }
 
+// ActualizarOrden reemplaza toda la orden por los datos nuevos, conservando el mismo ID.
 func (m *MemoriaCorrectivo) ActualizarOrden(id int, datos models.OrdenCorrectiva) (models.OrdenCorrectiva, bool) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -77,6 +82,7 @@ func (m *MemoriaCorrectivo) ActualizarOrden(id int, datos models.OrdenCorrectiva
 	return models.OrdenCorrectiva{}, false
 }
 
+// ActualizarOrdenParcial solo toca el estado y/o diagnóstico, deja el resto igual.
 func (m *MemoriaCorrectivo) ActualizarOrdenParcial(id int, estado string, diagnostico string) (models.OrdenCorrectiva, bool) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -94,6 +100,7 @@ func (m *MemoriaCorrectivo) ActualizarOrdenParcial(id int, estado string, diagno
 	return models.OrdenCorrectiva{}, false
 }
 
+// BorrarOrden elimina la orden del slice usando append para cerrar el hueco.
 func (m *MemoriaCorrectivo) BorrarOrden(id int) bool {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -110,6 +117,7 @@ func (m *MemoriaCorrectivo) BorrarOrden(id int) bool {
 // PROCESOS REPARACION
 // =========================================================
 
+// ListarProcesos devuelve una copia de todos los procesos registrados.
 func (m *MemoriaCorrectivo) ListarProcesos() []models.ProcesoReparacion {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -118,6 +126,7 @@ func (m *MemoriaCorrectivo) ListarProcesos() []models.ProcesoReparacion {
 	return copia
 }
 
+// BuscarProcesoPorID recorre los procesos y devuelve el que coincida con el ID, o false si no existe.
 func (m *MemoriaCorrectivo) BuscarProcesoPorID(id int) (models.ProcesoReparacion, bool) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -129,6 +138,7 @@ func (m *MemoriaCorrectivo) BuscarProcesoPorID(id int) (models.ProcesoReparacion
 	return models.ProcesoReparacion{}, false
 }
 
+// CrearProceso le asigna un ID al proceso y lo agrega al slice.
 func (m *MemoriaCorrectivo) CrearProceso(p models.ProcesoReparacion) models.ProcesoReparacion {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -138,6 +148,7 @@ func (m *MemoriaCorrectivo) CrearProceso(p models.ProcesoReparacion) models.Proc
 	return p
 }
 
+// ActualizarProceso reemplaza todo el proceso con los datos nuevos, conservando el mismo ID.
 func (m *MemoriaCorrectivo) ActualizarProceso(id int, datos models.ProcesoReparacion) (models.ProcesoReparacion, bool) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -151,6 +162,7 @@ func (m *MemoriaCorrectivo) ActualizarProceso(id int, datos models.ProcesoRepara
 	return models.ProcesoReparacion{}, false
 }
 
+// BorrarProceso elimina el proceso del slice usando append para cerrar el hueco.
 func (m *MemoriaCorrectivo) BorrarProceso(id int) bool {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -167,6 +179,7 @@ func (m *MemoriaCorrectivo) BorrarProceso(id int) bool {
 // EVIDENCIAS DANIO
 // =========================================================
 
+// ListarEvidencias devuelve una copia de todas las evidencias registradas.
 func (m *MemoriaCorrectivo) ListarEvidencias() []models.EvidenciaDanio {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -175,6 +188,7 @@ func (m *MemoriaCorrectivo) ListarEvidencias() []models.EvidenciaDanio {
 	return copia
 }
 
+// BuscarEvidenciaPorID recorre las evidencias y devuelve la que coincida con el ID, o false si no existe.
 func (m *MemoriaCorrectivo) BuscarEvidenciaPorID(id int) (models.EvidenciaDanio, bool) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -186,6 +200,7 @@ func (m *MemoriaCorrectivo) BuscarEvidenciaPorID(id int) (models.EvidenciaDanio,
 	return models.EvidenciaDanio{}, false
 }
 
+// CrearEvidencia le asigna un ID a la evidencia y la agrega al slice.
 func (m *MemoriaCorrectivo) CrearEvidencia(e models.EvidenciaDanio) models.EvidenciaDanio {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -195,6 +210,7 @@ func (m *MemoriaCorrectivo) CrearEvidencia(e models.EvidenciaDanio) models.Evide
 	return e
 }
 
+// ActualizarEvidencia reemplaza toda la evidencia con los datos nuevos, conservando el mismo ID.
 func (m *MemoriaCorrectivo) ActualizarEvidencia(id int, datos models.EvidenciaDanio) (models.EvidenciaDanio, bool) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -208,6 +224,7 @@ func (m *MemoriaCorrectivo) ActualizarEvidencia(id int, datos models.EvidenciaDa
 	return models.EvidenciaDanio{}, false
 }
 
+// BorrarEvidencia elimina la evidencia del slice usando append para cerrar el hueco.
 func (m *MemoriaCorrectivo) BorrarEvidencia(id int) bool {
 	m.mu.Lock()
 	defer m.mu.Unlock()
