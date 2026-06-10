@@ -1,6 +1,7 @@
 package models
 
-// OrdenCorrectiva representa una orden de reparación correctiva de un dispositivo.
+// OrdenCorrectiva es la orden que se crea cuando llega un dispositivo a reparar.
+// Guarda el problema que reportó el cliente, el diagnóstico del técnico y el estado actual.
 type OrdenCorrectiva struct {
 	ID                int     `json:"id"`
 	Codigo            string  `json:"codigo"`
@@ -15,7 +16,8 @@ type OrdenCorrectiva struct {
 	TecnicoID         int     `json:"tecnico_id"`
 }
 
-// ProcesoReparacion representa una etapa del proceso de reparación de una orden correctiva.
+// ProcesoReparacion representa cada paso que se hace durante la reparación.
+// Está ligado a una orden correctiva mediante OrdenCorrectivaID.
 type ProcesoReparacion struct {
 	ID                int    `json:"id"`
 	Etapa             string `json:"etapa"`
@@ -24,7 +26,8 @@ type ProcesoReparacion struct {
 	OrdenCorrectivaID int    `json:"orden_correctiva_id"`
 }
 
-// EvidenciaDanio representa una evidencia fotográfica o descriptiva del daño reportado.
+// EvidenciaDanio guarda la descripción o foto del daño que tiene el dispositivo.
+// También va ligada a una orden correctiva.
 type EvidenciaDanio struct {
 	ID                int    `json:"id"`
 	Descripcion       string `json:"descripcion"`
