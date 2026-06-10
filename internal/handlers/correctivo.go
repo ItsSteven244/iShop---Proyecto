@@ -12,22 +12,22 @@ import (
 	"github.com/ItsSteven244/iShop---Proyecto/internal/storage"
 )
 
-// CorrectivosServer agrupa el storage del módulo correctivo.
+// CorrectivosServer guarda el storage que voy a usar en los handlers.
 type CorrectivosServer struct {
 	Storage *storage.MemoriaCorrectivo
 }
 
-// NewCorrectivosServer construye un CorrectivosServer listo para usar.
+// NewCorrectivosServer inicializa el server con el storage recibido.
 func NewCorrectivosServer(s *storage.MemoriaCorrectivo) *CorrectivosServer {
 	return &CorrectivosServer{Storage: s}
 }
 
-// CorrectivosRouter registra todas las rutas del módulo correctivo.
+// CorrectivosRouter define todas las rutas de mi módulo correctivo con subrouter Chi.
 func CorrectivosRouter(store *storage.MemoriaCorrectivo) http.Handler {
 	s := NewCorrectivosServer(store)
 	r := chi.NewRouter()
 
-	// Ordenes correctivas
+	// Rutas para ordenes correctivas
 	r.Get("/ordenes", s.ListarOrdenes)
 	r.Post("/ordenes", s.CrearOrden)
 	r.Get("/ordenes/{id}", s.ObtenerOrden)
@@ -35,14 +35,14 @@ func CorrectivosRouter(store *storage.MemoriaCorrectivo) http.Handler {
 	r.Patch("/ordenes/{id}", s.ActualizarEstadoOrden)
 	r.Delete("/ordenes/{id}", s.BorrarOrden)
 
-	// Procesos de reparacion
+	// Rutas para procesos de reparacion
 	r.Get("/procesos", s.ListarProcesos)
 	r.Post("/procesos", s.CrearProceso)
 	r.Get("/procesos/{id}", s.ObtenerProceso)
 	r.Put("/procesos/{id}", s.ActualizarProceso)
 	r.Delete("/procesos/{id}", s.BorrarProceso)
 
-	// Evidencias de daño
+	// Rutas para evidencias de daño
 	r.Get("/evidencias", s.ListarEvidencias)
 	r.Post("/evidencias", s.CrearEvidencia)
 	r.Get("/evidencias/{id}", s.ObtenerEvidencia)
@@ -56,10 +56,12 @@ func CorrectivosRouter(store *storage.MemoriaCorrectivo) http.Handler {
 // ORDENES CORRECTIVAS
 // =========================================================
 
+// ListarOrdenes devuelve todas las ordenes correctivas registradas.
 func (s *CorrectivosServer) ListarOrdenes(w http.ResponseWriter, r *http.Request) {
 	RespondJSON(w, http.StatusOK, s.Storage.ListarOrdenes())
 }
 
+// ObtenerOrden busca una orden por su ID, si no existe devuelve 404.
 func (s *CorrectivosServer) ObtenerOrden(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -74,6 +76,7 @@ func (s *CorrectivosServer) ObtenerOrden(w http.ResponseWriter, r *http.Request)
 	RespondJSON(w, http.StatusOK, orden)
 }
 
+// CrearOrden recibe los datos de la orden, valida los campos obligatorios y la guarda.
 func (s *CorrectivosServer) CrearOrden(w http.ResponseWriter, r *http.Request) {
 	var nueva models.OrdenCorrectiva
 	if err := json.NewDecoder(r.Body).Decode(&nueva); err != nil {
@@ -91,6 +94,7 @@ func (s *CorrectivosServer) CrearOrden(w http.ResponseWriter, r *http.Request) {
 	RespondJSON(w, http.StatusCreated, s.Storage.CrearOrden(nueva))
 }
 
+// ActualizarOrden reemplaza completamente una orden existente por su ID.
 func (s *CorrectivosServer) ActualizarOrden(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -114,6 +118,7 @@ func (s *CorrectivosServer) ActualizarOrden(w http.ResponseWriter, r *http.Reque
 	RespondJSON(w, http.StatusOK, actualizada)
 }
 
+// ActualizarEstadoOrden actualiza solo el estado y/o diagnostico de una orden.
 func (s *CorrectivosServer) ActualizarEstadoOrden(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -136,6 +141,7 @@ func (s *CorrectivosServer) ActualizarEstadoOrden(w http.ResponseWriter, r *http
 	RespondJSON(w, http.StatusOK, actualizada)
 }
 
+// BorrarOrden elimina una orden por su ID, si no existe devuelve 404.
 func (s *CorrectivosServer) BorrarOrden(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -153,10 +159,12 @@ func (s *CorrectivosServer) BorrarOrden(w http.ResponseWriter, r *http.Request) 
 // PROCESOS REPARACION
 // =========================================================
 
+// ListarProcesos devuelve todos los procesos de reparacion registrados.
 func (s *CorrectivosServer) ListarProcesos(w http.ResponseWriter, r *http.Request) {
 	RespondJSON(w, http.StatusOK, s.Storage.ListarProcesos())
 }
 
+// ObtenerProceso busca un proceso por su ID, si no existe devuelve 404.
 func (s *CorrectivosServer) ObtenerProceso(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -171,6 +179,7 @@ func (s *CorrectivosServer) ObtenerProceso(w http.ResponseWriter, r *http.Reques
 	RespondJSON(w, http.StatusOK, proceso)
 }
 
+// CrearProceso recibe los datos del proceso, valida los campos obligatorios y lo guarda.
 func (s *CorrectivosServer) CrearProceso(w http.ResponseWriter, r *http.Request) {
 	var nuevo models.ProcesoReparacion
 	if err := json.NewDecoder(r.Body).Decode(&nuevo); err != nil {
@@ -188,6 +197,7 @@ func (s *CorrectivosServer) CrearProceso(w http.ResponseWriter, r *http.Request)
 	RespondJSON(w, http.StatusCreated, s.Storage.CrearProceso(nuevo))
 }
 
+// ActualizarProceso reemplaza completamente un proceso existente por su ID.
 func (s *CorrectivosServer) ActualizarProceso(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -211,6 +221,7 @@ func (s *CorrectivosServer) ActualizarProceso(w http.ResponseWriter, r *http.Req
 	RespondJSON(w, http.StatusOK, actualizado)
 }
 
+// BorrarProceso elimina un proceso por su ID, si no existe devuelve 404.
 func (s *CorrectivosServer) BorrarProceso(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -228,10 +239,12 @@ func (s *CorrectivosServer) BorrarProceso(w http.ResponseWriter, r *http.Request
 // EVIDENCIAS DANIO
 // =========================================================
 
+// ListarEvidencias devuelve todas las evidencias de daño registradas.
 func (s *CorrectivosServer) ListarEvidencias(w http.ResponseWriter, r *http.Request) {
 	RespondJSON(w, http.StatusOK, s.Storage.ListarEvidencias())
 }
 
+// ObtenerEvidencia busca una evidencia por su ID, si no existe devuelve 404.
 func (s *CorrectivosServer) ObtenerEvidencia(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -246,6 +259,7 @@ func (s *CorrectivosServer) ObtenerEvidencia(w http.ResponseWriter, r *http.Requ
 	RespondJSON(w, http.StatusOK, evidencia)
 }
 
+// CrearEvidencia recibe los datos de la evidencia, valida los campos obligatorios y la guarda.
 func (s *CorrectivosServer) CrearEvidencia(w http.ResponseWriter, r *http.Request) {
 	var nueva models.EvidenciaDanio
 	if err := json.NewDecoder(r.Body).Decode(&nueva); err != nil {
@@ -263,6 +277,7 @@ func (s *CorrectivosServer) CrearEvidencia(w http.ResponseWriter, r *http.Reques
 	RespondJSON(w, http.StatusCreated, s.Storage.CrearEvidencia(nueva))
 }
 
+// ActualizarEvidencia reemplaza completamente una evidencia existente por su ID.
 func (s *CorrectivosServer) ActualizarEvidencia(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -286,6 +301,7 @@ func (s *CorrectivosServer) ActualizarEvidencia(w http.ResponseWriter, r *http.R
 	RespondJSON(w, http.StatusOK, actualizada)
 }
 
+// BorrarEvidencia elimina una evidencia por su ID, si no existe devuelve 404.
 func (s *CorrectivosServer) BorrarEvidencia(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
