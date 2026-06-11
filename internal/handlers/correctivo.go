@@ -118,7 +118,7 @@ func (s *CorrectivosServer) ActualizarOrden(w http.ResponseWriter, r *http.Reque
 	RespondJSON(w, http.StatusOK, actualizada)
 }
 
-// ActualizarEstadoOrden actualiza solo el estado y/o diagnostico de una orden.
+// ActualizarEstadoOrden actualiza solo el estado y/o diagnostico de una orden..
 func (s *CorrectivosServer) ActualizarEstadoOrden(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
