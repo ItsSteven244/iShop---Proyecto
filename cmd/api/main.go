@@ -17,6 +17,8 @@ func main() {
 
 	// 2. Crear el storage del módulo de suscripciones.
 	suscripcionesStorage := storage.NuevaMemoriaSuscripciones()
+	// 3. Crear el storage del módulo de suscripciones.
+	preventivoStorage := storage.NuevaMemoriaPreventivo()
 
 	// 3. Configurar el router principal.
 	r := chi.NewRouter()
@@ -28,6 +30,9 @@ func main() {
 
 	// 5. Montar el subrouter del módulo de suscripciones.
 	r.Mount("/api/v1/suscripciones", handlers.SuscripcionesRouter(suscripcionesStorage))
+
+	// 6. Montar el subrouter del módulo de preventivos.
+	r.Mount("/api/v1/preventivos", handlers.PreventivoRouter(preventivoStorage))
 
 	log.Println("Servidor escuchando en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
