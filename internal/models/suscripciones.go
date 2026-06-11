@@ -1,7 +1,7 @@
 package models
 
 // ServicioDigital representa un servicio como Netflix, Spotify, etc.
-// Guarda el nombre, categoría, precio, duración y cuántos perfiles incluye.
+// Guarda el nombre, categoría, precio, duración y cuántos perfiles incluye..
 type ServicioDigital struct {
 	ID               int     `json:"id"`
 	Nombre           string  `json:"nombre"`
