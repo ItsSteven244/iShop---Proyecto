@@ -31,7 +31,7 @@ func main() {
 	// 5. Montar el subrouter del módulo de suscripciones.
 	r.Mount("/api/v1/suscripciones", handlers.SuscripcionesRouter(suscripcionesStorage))
 
-	// 6. Montar el subrouter del módulo de preventivos.
+	// 6. Montar el subrouter del módulo de preventivos ..
 	r.Mount("/api/v1/preventivos", handlers.PreventivoRouter(preventivoStorage))
 
 	log.Println("Servidor escuchando en http://localhost:8080")
