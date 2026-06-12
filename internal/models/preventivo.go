@@ -22,7 +22,7 @@ type TareaPreventiva struct {
 }
 
 // InsumoPreventivo representa un insumo o repuesto usado en un mantenimiento preventivo.
-// Guarda el nombre, cantidad y a qué mantenimiento pertenece.
+// Guarda el nombre, cantidad y a qué mantenimiento pertenece..
 type InsumoPreventivo struct {
 	ID                        int     `json:"id"`
 	Nombre                    string  `json:"nombre"`
