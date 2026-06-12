@@ -12,7 +12,7 @@ type MantenimientoPreventivo struct {
 }
 
 // TareaPreventiva representa una tarea específica dentro de un mantenimiento preventivo.
-// Está ligada a un mantenimiento mediante MantenimientoPreventivoID.
+// Está ligada a un mantenimiento mediante MantenimientoPreventivoID..
 type TareaPreventiva struct {
 	ID                        int    `json:"id"`
 	Descripcion               string `json:"descripcion"`
