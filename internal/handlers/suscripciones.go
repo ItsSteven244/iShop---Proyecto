@@ -86,8 +86,20 @@ func (s *SuscripcionesServer) CrearServicio(w http.ResponseWriter, r *http.Reque
 		RespondError(w, http.StatusBadRequest, "el campo nombre es obligatorio")
 		return
 	}
+	if strings.TrimSpace(nuevo.Categoria) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo categoria es obligatorio")
+		return
+	}
 	if nuevo.Precio <= 0 {
 		RespondError(w, http.StatusBadRequest, "el campo precio debe ser mayor a 0")
+		return
+	}
+	if nuevo.DuracionDias <= 0 {
+		RespondError(w, http.StatusBadRequest, "el campo duracion_dias debe ser mayor a 0")
+		return
+	}
+	if nuevo.CantidadPerfiles <= 0 {
+		RespondError(w, http.StatusBadRequest, "el campo cantidad_perfiles debe ser mayor a 0")
 		return
 	}
 	RespondJSON(w, http.StatusCreated, s.Storage.CrearServicio(nuevo))
