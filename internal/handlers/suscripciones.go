@@ -262,6 +262,14 @@ func (s *SuscripcionesServer) CrearAcceso(w http.ResponseWriter, r *http.Request
 		RespondError(w, http.StatusBadRequest, "el campo correo_acceso es obligatorio")
 		return
 	}
+	if strings.TrimSpace(nuevo.Perfil) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo perfil es obligatorio")
+		return
+	}
+	if strings.TrimSpace(nuevo.Estado) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo estado es obligatorio")
+		return
+	}
 	if nuevo.SuscripcionClienteID == 0 {
 		RespondError(w, http.StatusBadRequest, "el campo suscripcion_cliente_id es obligatorio")
 		return
