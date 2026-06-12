@@ -192,7 +192,7 @@ func (m *MemoriaPreventivo) CrearInsumo(ins models.InsumoPreventivo) models.Insu
 	return ins
 }
 
-// ActualizarInsumo reemplaza el insumo con el ID dado.
+// ActualizarInsumo reemplaza el insumo con el ID dado..
 func (m *MemoriaPreventivo) ActualizarInsumo(id int, datos models.InsumoPreventivo) (models.InsumoPreventivo, bool) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
