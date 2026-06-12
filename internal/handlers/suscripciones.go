@@ -174,6 +174,18 @@ func (s *SuscripcionesServer) CrearSuscripcion(w http.ResponseWriter, r *http.Re
 		RespondError(w, http.StatusBadRequest, "el campo fecha_inicio es obligatorio")
 		return
 	}
+	if strings.TrimSpace(nueva.FechaFin) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo fecha_fin es obligatorio")
+		return
+	}
+	if strings.TrimSpace(nueva.Estado) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo estado es obligatorio")
+		return
+	}
+	if nueva.TecnicoID == 0 {
+		RespondError(w, http.StatusBadRequest, "el campo tecnico_id es obligatorio")
+		return
+	}
 	RespondJSON(w, http.StatusCreated, s.Storage.CrearSuscripcion(nueva))
 }
 
