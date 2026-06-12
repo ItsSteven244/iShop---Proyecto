@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"encoding/json"
-	"net/http"
+	"encoding/json" // Importa el paquete json / traductor de go a json
+	"net/http"      //para trabajar con las respuestas HTTP
 )
 
 // RespondJSON escribe una respuesta JSON con el status code dado.

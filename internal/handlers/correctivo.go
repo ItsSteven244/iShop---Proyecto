@@ -1,18 +1,18 @@
 package handlers
 
 import (
-	"encoding/json"
-	"net/http"
-	"strconv"
-	"strings"
+	"encoding/json" //traductor go a json
+	"net/http"      //para manejar peticiones y respuestas HTTP
+	"strconv"       // para convertir texto a número (ej: "3" → 3)
+	"strings"       // para manipular texto (ej: quitar espacios)
 
-	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5" // el router chi — maneja las rutas URL
 
 	"github.com/ItsSteven244/iShop---Proyecto/internal/models"
 	"github.com/ItsSteven244/iShop---Proyecto/internal/storage"
 )
 
-// CorrectivosServer guarda el storage que voy a usar en los handlers.
+// CorrectivosServer carga el storage que voy a usar en los handlers.
 type CorrectivosServer struct {
 	Storage *storage.MemoriaCorrectivo
 }
@@ -62,9 +62,9 @@ func (s *CorrectivosServer) ListarOrdenes(w http.ResponseWriter, r *http.Request
 }
 
 // ObtenerOrden busca una orden por su ID, si no existe devuelve 404.
-func (s *CorrectivosServer) ObtenerOrden(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err != nil {
+func (s *CorrectivosServer) ObtenerOrden(w http.ResponseWriter, r *http.Request) { //w para responder
+	id, err := strconv.Atoi(chi.URLParam(r, "id")) //atoi convierte string a int   // y r contiene todo lo que mando el cliente
+	if err != nil {                                //si algo salio mal se ejcuta el error de abajo
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
 	}
@@ -73,14 +73,14 @@ func (s *CorrectivosServer) ObtenerOrden(w http.ResponseWriter, r *http.Request)
 		RespondError(w, http.StatusNotFound, "orden correctiva no encontrada")
 		return
 	}
-	RespondJSON(w, http.StatusOK, orden)
+	RespondJSON(w, http.StatusOK, orden) //si todo sale bien obtiene orden
 }
 
 // CrearOrden recibe los datos de la orden, valida los campos obligatorios y la guarda.
-func (s *CorrectivosServer) CrearOrden(w http.ResponseWriter, r *http.Request) {
-	var nueva models.OrdenCorrectiva
-	if err := json.NewDecoder(r.Body).Decode(&nueva); err != nil {
-		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
+func (s *CorrectivosServer) CrearOrden(w http.ResponseWriter, r *http.Request) { //w para responder y r contiene todo lo que mando el cliente
+	var nueva models.OrdenCorrectiva                               //creo una nueva orden donde se guardar los datos que envie el cliente
+	if err := json.NewDecoder(r.Body).Decode(&nueva); err != nil { //traduce json y llena el formulario, en caso de error
+		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error()) //como por ejemplo se envio un json mal envie error 404
 		return
 	}
 	if strings.TrimSpace(nueva.Codigo) == "" {
@@ -91,19 +91,19 @@ func (s *CorrectivosServer) CrearOrden(w http.ResponseWriter, r *http.Request) {
 		RespondError(w, http.StatusBadRequest, "el campo problema_reportado es obligatorio")
 		return
 	}
-	RespondJSON(w, http.StatusCreated, s.Storage.CrearOrden(nueva))
+	RespondJSON(w, http.StatusCreated, s.Storage.CrearOrden(nueva)) //si todo sale bien crea orden
 }
 
 // ActualizarOrden reemplaza completamente una orden existente por su ID.
-func (s *CorrectivosServer) ActualizarOrden(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+func (s *CorrectivosServer) ActualizarOrden(w http.ResponseWriter, r *http.Request) { //w para responder
+	id, err := strconv.Atoi(chi.URLParam(r, "id")) //atoi convierte string a int   // y r contiene todo lo que mando el cliente
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
 	}
 	var datos models.OrdenCorrectiva
-	if err := json.NewDecoder(r.Body).Decode(&datos); err != nil {
-		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
+	if err := json.NewDecoder(r.Body).Decode(&datos); err != nil { //traduce json y llena el formulario en caso de error
+		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error()) //como por ejemplo se envio un json mal envie error 404
 		return
 	}
 	if strings.TrimSpace(datos.ProblemaReportado) == "" {
@@ -115,22 +115,22 @@ func (s *CorrectivosServer) ActualizarOrden(w http.ResponseWriter, r *http.Reque
 		RespondError(w, http.StatusNotFound, "orden correctiva no encontrada")
 		return
 	}
-	RespondJSON(w, http.StatusOK, actualizada)
+	RespondJSON(w, http.StatusOK, actualizada) //si todo sale bien actualiza
 }
 
 // ActualizarEstadoOrden actualiza solo el estado y/o diagnostico de una orden.
-func (s *CorrectivosServer) ActualizarEstadoOrden(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+func (s *CorrectivosServer) ActualizarEstadoOrden(w http.ResponseWriter, r *http.Request) { //w para responder
+	id, err := strconv.Atoi(chi.URLParam(r, "id")) //atoi convierte string a int   // y r contiene todo lo que mando el cliente
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
 	}
-	var body struct {
+	var body struct { //crear formulario en el momento con solo los campos que senecesita, no se necesita todo completo
 		Estado      string `json:"estado"`
 		Diagnostico string `json:"diagnostico"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil { //traduce json y llena el formulario en caso de error
+		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error()) //como por ejemplo se envio un json mal envie error 404
 		return
 	}
 	actualizada, encontrado := s.Storage.ActualizarOrdenParcial(id, body.Estado, body.Diagnostico)
@@ -138,12 +138,12 @@ func (s *CorrectivosServer) ActualizarEstadoOrden(w http.ResponseWriter, r *http
 		RespondError(w, http.StatusNotFound, "orden correctiva no encontrada")
 		return
 	}
-	RespondJSON(w, http.StatusOK, actualizada)
+	RespondJSON(w, http.StatusOK, actualizada) //si todo sale bien actualiza
 }
 
 // BorrarOrden elimina una orden por su ID, si no existe devuelve 404.
-func (s *CorrectivosServer) BorrarOrden(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+func (s *CorrectivosServer) BorrarOrden(w http.ResponseWriter, r *http.Request) { //w para responder
+	id, err := strconv.Atoi(chi.URLParam(r, "id")) //atoi convierte string a int   // y r contiene todo lo que mando el cliente
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
@@ -152,7 +152,7 @@ func (s *CorrectivosServer) BorrarOrden(w http.ResponseWriter, r *http.Request) 
 		RespondError(w, http.StatusNotFound, "orden correctiva no encontrada")
 		return
 	}
-	RespondJSON(w, http.StatusNoContent, nil)
+	RespondJSON(w, http.StatusNoContent, nil) //si todo salio bien elimina
 }
 
 // =========================================================
@@ -165,8 +165,8 @@ func (s *CorrectivosServer) ListarProcesos(w http.ResponseWriter, r *http.Reques
 }
 
 // ObtenerProceso busca un proceso por su ID, si no existe devuelve 404.
-func (s *CorrectivosServer) ObtenerProceso(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+func (s *CorrectivosServer) ObtenerProceso(w http.ResponseWriter, r *http.Request) { //w para responder
+	id, err := strconv.Atoi(chi.URLParam(r, "id")) //atoi convierte string a int   // y r contiene todo lo que mando el cliente
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
@@ -176,14 +176,14 @@ func (s *CorrectivosServer) ObtenerProceso(w http.ResponseWriter, r *http.Reques
 		RespondError(w, http.StatusNotFound, "proceso de reparación no encontrado")
 		return
 	}
-	RespondJSON(w, http.StatusOK, proceso)
+	RespondJSON(w, http.StatusOK, proceso) //si todo sale bien obtiene
 }
 
 // CrearProceso recibe los datos del proceso, valida los campos obligatorios y lo guarda.
-func (s *CorrectivosServer) CrearProceso(w http.ResponseWriter, r *http.Request) {
+func (s *CorrectivosServer) CrearProceso(w http.ResponseWriter, r *http.Request) { //w para responder y r contiene todo lo que mando el cliente
 	var nuevo models.ProcesoReparacion
-	if err := json.NewDecoder(r.Body).Decode(&nuevo); err != nil {
-		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
+	if err := json.NewDecoder(r.Body).Decode(&nuevo); err != nil { //traduce json y llena el formulario en caso de error
+		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error()) //como por ejemplo se envio un json mal envie error 404
 		return
 	}
 	if strings.TrimSpace(nuevo.Etapa) == "" {
@@ -198,15 +198,15 @@ func (s *CorrectivosServer) CrearProceso(w http.ResponseWriter, r *http.Request)
 }
 
 // ActualizarProceso reemplaza completamente un proceso existente por su ID.
-func (s *CorrectivosServer) ActualizarProceso(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+func (s *CorrectivosServer) ActualizarProceso(w http.ResponseWriter, r *http.Request) { //w para responder y r contiene todo lo que mando el cliente
+	id, err := strconv.Atoi(chi.URLParam(r, "id")) //atoi convierte string a int
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
 	}
 	var datos models.ProcesoReparacion
-	if err := json.NewDecoder(r.Body).Decode(&datos); err != nil {
-		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
+	if err := json.NewDecoder(r.Body).Decode(&datos); err != nil { //traduce json y llena el formulario en caso de error
+		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error()) //como por ejemplo se envio un json mal envie error 404
 		return
 	}
 	if strings.TrimSpace(datos.Etapa) == "" {
@@ -222,8 +222,8 @@ func (s *CorrectivosServer) ActualizarProceso(w http.ResponseWriter, r *http.Req
 }
 
 // BorrarProceso elimina un proceso por su ID, si no existe devuelve 404.
-func (s *CorrectivosServer) BorrarProceso(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+func (s *CorrectivosServer) BorrarProceso(w http.ResponseWriter, r *http.Request) { //w para responder y r contiene todo lo que mando el cliente
+	id, err := strconv.Atoi(chi.URLParam(r, "id")) //atoi convierte string a int
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
@@ -245,8 +245,8 @@ func (s *CorrectivosServer) ListarEvidencias(w http.ResponseWriter, r *http.Requ
 }
 
 // ObtenerEvidencia busca una evidencia por su ID, si no existe devuelve 404.
-func (s *CorrectivosServer) ObtenerEvidencia(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+func (s *CorrectivosServer) ObtenerEvidencia(w http.ResponseWriter, r *http.Request) { //w para responder y r contiene todo lo que mando el cliente
+	id, err := strconv.Atoi(chi.URLParam(r, "id")) //atoi convierte string a int
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
@@ -260,10 +260,10 @@ func (s *CorrectivosServer) ObtenerEvidencia(w http.ResponseWriter, r *http.Requ
 }
 
 // CrearEvidencia recibe los datos de la evidencia, valida los campos obligatorios y la guarda.
-func (s *CorrectivosServer) CrearEvidencia(w http.ResponseWriter, r *http.Request) {
+func (s *CorrectivosServer) CrearEvidencia(w http.ResponseWriter, r *http.Request) { //w para responder y r contiene todo lo que mando el cliente
 	var nueva models.EvidenciaDanio
-	if err := json.NewDecoder(r.Body).Decode(&nueva); err != nil {
-		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
+	if err := json.NewDecoder(r.Body).Decode(&nueva); err != nil { //traduce json y llena el formulario en caso de error
+		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error()) //como por ejemplo se envio un json mal envie error 404
 		return
 	}
 	if strings.TrimSpace(nueva.Descripcion) == "" {
@@ -278,15 +278,15 @@ func (s *CorrectivosServer) CrearEvidencia(w http.ResponseWriter, r *http.Reques
 }
 
 // ActualizarEvidencia reemplaza completamente una evidencia existente por su ID.
-func (s *CorrectivosServer) ActualizarEvidencia(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+func (s *CorrectivosServer) ActualizarEvidencia(w http.ResponseWriter, r *http.Request) { //w para responder y r contiene todo lo que mando el cliente
+	id, err := strconv.Atoi(chi.URLParam(r, "id")) //atoi convierte string a int
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
 	}
 	var datos models.EvidenciaDanio
-	if err := json.NewDecoder(r.Body).Decode(&datos); err != nil {
-		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
+	if err := json.NewDecoder(r.Body).Decode(&datos); err != nil { //traduce json y llena el formulario en caso de error
+		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error()) //como por ejemplo se envio un json mal envie error 404
 		return
 	}
 	if strings.TrimSpace(datos.Descripcion) == "" {
@@ -302,8 +302,8 @@ func (s *CorrectivosServer) ActualizarEvidencia(w http.ResponseWriter, r *http.R
 }
 
 // BorrarEvidencia elimina una evidencia por su ID, si no existe devuelve 404.
-func (s *CorrectivosServer) BorrarEvidencia(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+func (s *CorrectivosServer) BorrarEvidencia(w http.ResponseWriter, r *http.Request) { //w para responder y r contiene todo lo que mando el cliente
+	id, err := strconv.Atoi(chi.URLParam(r, "id")) //atoi convierte string a int
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
