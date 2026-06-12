@@ -309,6 +309,18 @@ func (s *SuscripcionesServer) ActualizarAcceso(w http.ResponseWriter, r *http.Re
 		RespondError(w, http.StatusBadRequest, "el campo correo_acceso es obligatorio")
 		return
 	}
+	if strings.TrimSpace(datos.Perfil) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo perfil es obligatorio")
+		return
+	}
+	if strings.TrimSpace(datos.Estado) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo estado es obligatorio")
+		return
+	}
+	if datos.SuscripcionClienteID == 0 {
+		RespondError(w, http.StatusBadRequest, "el campo suscripcion_cliente_id es obligatorio")
+		return
+	}
 	actualizado, encontrado := s.Storage.ActualizarAcceso(id, datos)
 	if !encontrado {
 		RespondError(w, http.StatusNotFound, "acceso digital no encontrado")
