@@ -109,6 +109,18 @@ func (s *SuscripcionesServer) ActualizarServicio(w http.ResponseWriter, r *http.
 		RespondError(w, http.StatusBadRequest, "el campo nombre es obligatorio")
 		return
 	}
+	if strings.TrimSpace(datos.Categoria) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo categoria es obligatorio")
+		return
+	}
+	if datos.Precio <= 0 {
+		RespondError(w, http.StatusBadRequest, "el campo precio debe ser mayor a 0")
+		return
+	}
+	if datos.DuracionDias <= 0 {
+		RespondError(w, http.StatusBadRequest, "el campo duracion_dias debe ser mayor a 0")
+		return
+	}
 	actualizado, encontrado := s.Storage.ActualizarServicio(id, datos)
 	if !encontrado {
 		RespondError(w, http.StatusNotFound, "servicio digital no encontrado")
