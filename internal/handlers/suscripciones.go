@@ -205,6 +205,22 @@ func (s *SuscripcionesServer) ActualizarSuscripcion(w http.ResponseWriter, r *ht
 		RespondError(w, http.StatusBadRequest, "el campo cliente_id es obligatorio")
 		return
 	}
+	if datos.ServicioDigitalID == 0 {
+		RespondError(w, http.StatusBadRequest, "el campo servicio_digital_id es obligatorio")
+		return
+	}
+	if strings.TrimSpace(datos.FechaInicio) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo fecha_inicio es obligatorio")
+		return
+	}
+	if strings.TrimSpace(datos.FechaFin) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo fecha_fin es obligatorio")
+		return
+	}
+	if strings.TrimSpace(datos.Estado) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo estado es obligatorio")
+		return
+	}
 	actualizada, encontrado := s.Storage.ActualizarSuscripcion(id, datos)
 	if !encontrado {
 		RespondError(w, http.StatusNotFound, "suscripción no encontrada")
