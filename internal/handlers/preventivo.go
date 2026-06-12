@@ -120,7 +120,7 @@ func (s *PreventivoServer) ActualizarMantenimiento(w http.ResponseWriter, r *htt
 	RespondJSON(w, http.StatusOK, actualizado)
 }
 
-// BorrarMantenimiento elimina un mantenimiento por su ID.
+// BorrarMantenimiento elimina un mantenimiento por su ID..
 func (s *PreventivoServer) BorrarMantenimiento(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
