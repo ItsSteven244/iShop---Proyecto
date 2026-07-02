@@ -12,4 +12,6 @@ var (
 	ErrTokenInvalido         = errors.New("token inexistente o invalido")
 	ErrEmailEnUso            = errors.New("email ya en uso")
 	ErrCredencialesInvalidas = errors.New("email o contraseña incorrectos")
+	ErrNombreServicioVacio   = errors.New("el campo nombre es obligatorio")
+	ErrPrecioInvalido        = errors.New("el campo precio debe ser mayor a 0")
 )

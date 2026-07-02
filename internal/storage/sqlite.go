@@ -145,3 +145,123 @@ func (g *CorrectivoGORM) BorrarEvidencia(id int) bool {
 	result := g.db.Delete(&models.EvidenciaDanio{}, id)
 	return result.RowsAffected > 0
 }
+
+// =========================================================
+// MÓDULO SUSCRIPCIONES - Luis
+// =========================================================
+
+type SuscripcionesGORM struct {
+	db *gorm.DB
+}
+
+func NuevoSuscripcionesGORM(db *gorm.DB) *SuscripcionesGORM {
+	return &SuscripcionesGORM{db: db}
+}
+
+// — Servicios Digitales —
+
+func (g *SuscripcionesGORM) ListarServicios() []models.ServicioDigital {
+	var servicios []models.ServicioDigital
+	g.db.Find(&servicios)
+	return servicios
+}
+
+func (g *SuscripcionesGORM) BuscarServicioPorID(id int) (models.ServicioDigital, bool) {
+	var servicio models.ServicioDigital
+	if g.db.First(&servicio, id).Error != nil {
+		return models.ServicioDigital{}, false
+	}
+	return servicio, true
+}
+
+func (g *SuscripcionesGORM) CrearServicio(s models.ServicioDigital) models.ServicioDigital {
+	g.db.Create(&s)
+	return s
+}
+
+func (g *SuscripcionesGORM) ActualizarServicio(id int, datos models.ServicioDigital) (models.ServicioDigital, bool) {
+	var servicio models.ServicioDigital
+	if g.db.First(&servicio, id).Error != nil {
+		return models.ServicioDigital{}, false
+	}
+	datos.ID = id
+	g.db.Save(&datos)
+	return datos, true
+}
+
+func (g *SuscripcionesGORM) BorrarServicio(id int) bool {
+	result := g.db.Delete(&models.ServicioDigital{}, id)
+	return result.RowsAffected > 0
+}
+
+// — Suscripciones de Clientes —
+
+func (g *SuscripcionesGORM) ListarSuscripciones() []models.SuscripcionCliente {
+	var suscripciones []models.SuscripcionCliente
+	g.db.Find(&suscripciones)
+	return suscripciones
+}
+
+func (g *SuscripcionesGORM) BuscarSuscripcionPorID(id int) (models.SuscripcionCliente, bool) {
+	var suscripcion models.SuscripcionCliente
+	if g.db.First(&suscripcion, id).Error != nil {
+		return models.SuscripcionCliente{}, false
+	}
+	return suscripcion, true
+}
+
+func (g *SuscripcionesGORM) CrearSuscripcion(s models.SuscripcionCliente) models.SuscripcionCliente {
+	g.db.Create(&s)
+	return s
+}
+
+func (g *SuscripcionesGORM) ActualizarSuscripcion(id int, datos models.SuscripcionCliente) (models.SuscripcionCliente, bool) {
+	var suscripcion models.SuscripcionCliente
+	if g.db.First(&suscripcion, id).Error != nil {
+		return models.SuscripcionCliente{}, false
+	}
+	datos.ID = id
+	g.db.Save(&datos)
+	return datos, true
+}
+
+func (g *SuscripcionesGORM) BorrarSuscripcion(id int) bool {
+	result := g.db.Delete(&models.SuscripcionCliente{}, id)
+	return result.RowsAffected > 0
+}
+
+// — Accesos Digitales —
+
+func (g *SuscripcionesGORM) ListarAccesos() []models.AccesoDigital {
+	var accesos []models.AccesoDigital
+	g.db.Find(&accesos)
+	return accesos
+}
+
+func (g *SuscripcionesGORM) BuscarAccesoPorID(id int) (models.AccesoDigital, bool) {
+	var acceso models.AccesoDigital
+	if g.db.First(&acceso, id).Error != nil {
+		return models.AccesoDigital{}, false
+	}
+	return acceso, true
+}
+
+func (g *SuscripcionesGORM) CrearAcceso(a models.AccesoDigital) models.AccesoDigital {
+	g.db.Create(&a)
+	return a
+}
+
+func (g *SuscripcionesGORM) ActualizarAcceso(id int, datos models.AccesoDigital) (models.AccesoDigital, bool) {
+	var acceso models.AccesoDigital
+	if g.db.First(&acceso, id).Error != nil {
+		return models.AccesoDigital{}, false
+	}
+	datos.ID = id
+	g.db.Save(&datos)
+	return datos, true
+}
+
+func (g *SuscripcionesGORM) BorrarAcceso(id int) bool {
+	result := g.db.Delete(&models.AccesoDigital{}, id)
+	return result.RowsAffected > 0
+}

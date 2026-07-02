@@ -48,3 +48,40 @@ type UserRepository interface {
 	CrearUsuario(u models.Usuario) (models.Usuario, error)
 	BuscarUsuarioPorEmail(email string) (models.Usuario, bool)
 }
+
+// =========================================================
+// MÓDULO SUSCRIPCIONES
+// =========================================================
+
+type ServicioDigitalRepository interface {
+	ListarServicios() []models.ServicioDigital
+	BuscarServicioPorID(id int) (models.ServicioDigital, bool)
+	CrearServicio(s models.ServicioDigital) models.ServicioDigital
+	ActualizarServicio(id int, datos models.ServicioDigital) (models.ServicioDigital, bool)
+	BorrarServicio(id int) bool
+}
+
+type SuscripcionClienteRepository interface {
+	ListarSuscripciones() []models.SuscripcionCliente
+	BuscarSuscripcionPorID(id int) (models.SuscripcionCliente, bool)
+	CrearSuscripcion(s models.SuscripcionCliente) models.SuscripcionCliente
+	ActualizarSuscripcion(id int, datos models.SuscripcionCliente) (models.SuscripcionCliente, bool)
+	BorrarSuscripcion(id int) bool
+}
+
+type AccesoDigitalRepository interface {
+	ListarAccesos() []models.AccesoDigital
+	BuscarAccesoPorID(id int) (models.AccesoDigital, bool)
+	CrearAcceso(a models.AccesoDigital) models.AccesoDigital
+	ActualizarAcceso(id int, datos models.AccesoDigital) (models.AccesoDigital, bool)
+	BorrarAcceso(id int) bool
+}
+
+type SuscripcionesRepository interface {
+	ServicioDigitalRepository
+	SuscripcionClienteRepository
+	AccesoDigitalRepository
+}
+
+var _ SuscripcionesRepository = (*MemoriaSuscripciones)(nil)
+var _ SuscripcionesRepository = (*SuscripcionesGORM)(nil)

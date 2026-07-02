@@ -27,7 +27,9 @@ func main() {
 		&models.ProcesoReparacion{},
 		&models.EvidenciaDanio{},
 		&models.Usuario{},
-		// compañeros agregan sus modelos aquí
+		&models.ServicioDigital{},
+		&models.SuscripcionCliente{},
+		&models.AccesoDigital{},
 	); err != nil {
 		log.Fatal("falló AutoMigrate: ", err)
 	}
@@ -35,14 +37,14 @@ func main() {
 	// 2. Crear los repositorios GORM.
 	correctivoRepo := storage.NuevoCorrectivoGORM(db)
 	usuarioRepo := storage.NewUsuarioGORM(db)
-	// compañeros agregan sus repositorios aquí
+	suscripcionesRepo := storage.NuevoSuscripcionesGORM(db)
 
 	// 3. Crear los servicios.
 	ordenService := service.NewOrdenCorrectivaService(correctivoRepo)
 	procesoService := service.NewProcesoReparacionService(correctivoRepo)
 	evidenciaService := service.NewEvidenciaDanioService(correctivoRepo)
 	authService := service.NewAuthService(usuarioRepo)
-	// compañeros agregan sus servicios aquí
+	servicioDigitalService := service.NewServicioDigitalService(suscripcionesRepo)
 
 	// 4. Crear el servidor con inyección de dependencias.
 	servidor := handlers.NewServer(ordenService, procesoService, evidenciaService, authService)
@@ -85,7 +87,8 @@ func main() {
 
 			// Módulo Preventivo - compañero agrega sus rutas aquí
 
-			// Módulo Suscripciones - compañero agrega sus rutas aquí
+			// Módulo Suscripciones
+			r.Mount("/", handlers.SuscripcionesRouter(suscripcionesRepo, servicioDigitalService))
 		})
 	})
 
