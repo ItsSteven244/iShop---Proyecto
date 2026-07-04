@@ -14,4 +14,6 @@ var (
 	ErrCredencialesInvalidas = errors.New("email o contraseña incorrectos")
 	ErrNombreServicioVacio   = errors.New("el campo nombre es obligatorio")
 	ErrPrecioInvalido        = errors.New("el campo precio debe ser mayor a 0")
+	ErrEquipoVacio           = errors.New("el campo equipo es obligatorio")
+	ErrFechaProgramadaVacia  = errors.New("el campo fecha_programada es obligatorio")
 )

@@ -265,3 +265,123 @@ func (g *SuscripcionesGORM) BorrarAcceso(id int) bool {
 	result := g.db.Delete(&models.AccesoDigital{}, id)
 	return result.RowsAffected > 0
 }
+
+// =========================================================
+// MÓDULO PREVENTIVO
+// =========================================================
+
+type PreventivoGORM struct {
+	db *gorm.DB
+}
+
+func NuevoPreventivoGORM(db *gorm.DB) *PreventivoGORM {
+	return &PreventivoGORM{db: db}
+}
+
+// — Mantenimientos Preventivos —
+
+func (g *PreventivoGORM) ListarMantenimientos() []models.MantenimientoPreventivo {
+	var mantenimientos []models.MantenimientoPreventivo
+	g.db.Find(&mantenimientos)
+	return mantenimientos
+}
+
+func (g *PreventivoGORM) BuscarMantenimientoPorID(id int) (models.MantenimientoPreventivo, bool) {
+	var mant models.MantenimientoPreventivo
+	if g.db.First(&mant, id).Error != nil {
+		return models.MantenimientoPreventivo{}, false
+	}
+	return mant, true
+}
+
+func (g *PreventivoGORM) CrearMantenimiento(mant models.MantenimientoPreventivo) models.MantenimientoPreventivo {
+	g.db.Create(&mant)
+	return mant
+}
+
+func (g *PreventivoGORM) ActualizarMantenimiento(id int, datos models.MantenimientoPreventivo) (models.MantenimientoPreventivo, bool) {
+	var mant models.MantenimientoPreventivo
+	if g.db.First(&mant, id).Error != nil {
+		return models.MantenimientoPreventivo{}, false
+	}
+	datos.ID = id
+	g.db.Save(&datos)
+	return datos, true
+}
+
+func (g *PreventivoGORM) BorrarMantenimiento(id int) bool {
+	result := g.db.Delete(&models.MantenimientoPreventivo{}, id)
+	return result.RowsAffected > 0
+}
+
+// — Tareas Preventivas —
+
+func (g *PreventivoGORM) ListarTareas() []models.TareaPreventiva {
+	var tareas []models.TareaPreventiva
+	g.db.Find(&tareas)
+	return tareas
+}
+
+func (g *PreventivoGORM) BuscarTareaPorID(id int) (models.TareaPreventiva, bool) {
+	var tarea models.TareaPreventiva
+	if g.db.First(&tarea, id).Error != nil {
+		return models.TareaPreventiva{}, false
+	}
+	return tarea, true
+}
+
+func (g *PreventivoGORM) CrearTarea(t models.TareaPreventiva) models.TareaPreventiva {
+	g.db.Create(&t)
+	return t
+}
+
+func (g *PreventivoGORM) ActualizarTarea(id int, datos models.TareaPreventiva) (models.TareaPreventiva, bool) {
+	var tarea models.TareaPreventiva
+	if g.db.First(&tarea, id).Error != nil {
+		return models.TareaPreventiva{}, false
+	}
+	datos.ID = id
+	g.db.Save(&datos)
+	return datos, true
+}
+
+func (g *PreventivoGORM) BorrarTarea(id int) bool {
+	result := g.db.Delete(&models.TareaPreventiva{}, id)
+	return result.RowsAffected > 0
+}
+
+// — Insumos Preventivos —
+
+func (g *PreventivoGORM) ListarInsumos() []models.InsumoPreventivo {
+	var insumos []models.InsumoPreventivo
+	g.db.Find(&insumos)
+	return insumos
+}
+
+func (g *PreventivoGORM) BuscarInsumoPorID(id int) (models.InsumoPreventivo, bool) {
+	var insumo models.InsumoPreventivo
+	if g.db.First(&insumo, id).Error != nil {
+		return models.InsumoPreventivo{}, false
+	}
+	return insumo, true
+}
+
+func (g *PreventivoGORM) CrearInsumo(ins models.InsumoPreventivo) models.InsumoPreventivo {
+	g.db.Create(&ins)
+	return ins
+}
+
+func (g *PreventivoGORM) ActualizarInsumo(id int, datos models.InsumoPreventivo) (models.InsumoPreventivo, bool) {
+	var insumo models.InsumoPreventivo
+	if g.db.First(&insumo, id).Error != nil {
+		return models.InsumoPreventivo{}, false
+	}
+	datos.ID = id
+	g.db.Save(&datos)
+	return datos, true
+}
+
+func (g *PreventivoGORM) BorrarInsumo(id int) bool {
+	result := g.db.Delete(&models.InsumoPreventivo{}, id)
+	return result.RowsAffected > 0
+}

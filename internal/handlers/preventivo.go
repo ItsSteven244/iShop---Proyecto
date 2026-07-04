@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -9,129 +10,254 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/ItsSteven244/iShop---Proyecto/internal/models"
+	"github.com/ItsSteven244/iShop---Proyecto/internal/service"
 	"github.com/ItsSteven244/iShop---Proyecto/internal/storage"
 )
 
-// PreventivoServer guarda el storage que voy a usar en los handlers.
 type PreventivoServer struct {
-	Storage *storage.MemoriaPreventivo
+	Storage       storage.PreventivoRepository
+	Mantenimiento *service.MantenimientoPreventivoService
 }
 
-// NewPreventivoServer inicializa el server con el storage recibido.
-func NewPreventivoServer(s *storage.MemoriaPreventivo) *PreventivoServer {
-	return &PreventivoServer{Storage: s}
+func NewPreventivoServer(s storage.PreventivoRepository, mantenimiento *service.MantenimientoPreventivoService) *PreventivoServer {
+	return &PreventivoServer{Storage: s, Mantenimiento: mantenimiento}
 }
 
-// PreventivoRouter define todas las rutas de mi módulo preventivo con subrouter Chi.
-func PreventivoRouter(store *storage.MemoriaPreventivo) http.Handler {
-	s := NewPreventivoServer(store)
+func PreventivoRouter(store storage.PreventivoRepository, mantenimiento *service.MantenimientoPreventivoService) http.Handler {
+	s := NewPreventivoServer(store, mantenimiento)
 	r := chi.NewRouter()
 
-	// Rutas para mantenimientos preventivos
 	r.Get("/mantenimientos", s.ListarMantenimientos)
 	r.Post("/mantenimientos", s.CrearMantenimiento)
 	r.Get("/mantenimientos/{id}", s.ObtenerMantenimiento)
 	r.Put("/mantenimientos/{id}", s.ActualizarMantenimiento)
 	r.Delete("/mantenimientos/{id}", s.BorrarMantenimiento)
 
+	r.Get("/tareas", s.ListarTareas)
+	r.Post("/tareas", s.CrearTarea)
+	r.Get("/tareas/{id}", s.ObtenerTarea)
+	r.Put("/tareas/{id}", s.ActualizarTarea)
+	r.Delete("/tareas/{id}", s.BorrarTarea)
+
+	r.Get("/insumos", s.ListarInsumos)
+	r.Post("/insumos", s.CrearInsumo)
+	r.Get("/insumos/{id}", s.ObtenerInsumo)
+	r.Put("/insumos/{id}", s.ActualizarInsumo)
+	r.Delete("/insumos/{id}", s.BorrarInsumo)
+
 	return r
 }
 
 // =========================================================
-// MANTENIMIENTOS PREVENTIVOS
+// MANTENIMIENTOS (vía service)
 // =========================================================
 
-// ListarMantenimientos devuelve todos los mantenimientos registrados.
 func (s *PreventivoServer) ListarMantenimientos(w http.ResponseWriter, r *http.Request) {
-	RespondJSON(w, http.StatusOK, s.Storage.ListarMantenimientos())
+	RespondJSON(w, http.StatusOK, s.Mantenimiento.Listar())
 }
 
-// ObtenerMantenimiento busca un mantenimiento por su ID.
 func (s *PreventivoServer) ObtenerMantenimiento(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
 	}
-
-	mantenimiento, encontrado := s.Storage.BuscarMantenimientoPorID(id)
-	if !encontrado {
-		RespondError(w, http.StatusNotFound, "mantenimiento preventivo no encontrado")
+	mant, err := s.Mantenimiento.Obtener(id)
+	if err != nil {
+		RespondError(w, http.StatusNotFound, "mantenimiento no encontrado")
 		return
 	}
-
-	RespondJSON(w, http.StatusOK, mantenimiento)
+	RespondJSON(w, http.StatusOK, mant)
 }
 
-// CrearMantenimiento recibe los datos del mantenimiento, valida los campos obligatorios y lo guarda.
 func (s *PreventivoServer) CrearMantenimiento(w http.ResponseWriter, r *http.Request) {
 	var nuevo models.MantenimientoPreventivo
-
 	if err := json.NewDecoder(r.Body).Decode(&nuevo); err != nil {
 		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
 		return
 	}
-
-	if strings.TrimSpace(nuevo.Equipo) == "" {
-		RespondError(w, http.StatusBadRequest, "el campo equipo es obligatorio")
+	creado, err := s.Mantenimiento.Crear(nuevo)
+	if err != nil {
+		RespondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-
-	if strings.TrimSpace(nuevo.FechaProgramada) == "" {
-		RespondError(w, http.StatusBadRequest, "el campo fecha_programada es obligatorio")
-		return
-	}
-
-	if strings.TrimSpace(nuevo.TipoMantenimiento) == "" {
-		RespondError(w, http.StatusBadRequest, "el campo tipo_mantenimiento es obligatorio")
-		return
-	}
-
-	RespondJSON(w, http.StatusCreated, s.Storage.CrearMantenimiento(nuevo))
+	RespondJSON(w, http.StatusCreated, creado)
 }
 
-// ActualizarMantenimiento reemplaza completamente un mantenimiento existente por su ID.
 func (s *PreventivoServer) ActualizarMantenimiento(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
 	}
-
 	var datos models.MantenimientoPreventivo
-
 	if err := json.NewDecoder(r.Body).Decode(&datos); err != nil {
 		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
 		return
 	}
-
-	if strings.TrimSpace(datos.Equipo) == "" {
-		RespondError(w, http.StatusBadRequest, "el campo equipo es obligatorio")
+	actualizado, err := s.Mantenimiento.Actualizar(id, datos)
+	if err != nil {
+		if errors.Is(err, service.ErrNoEncontrado) {
+			RespondError(w, http.StatusNotFound, "mantenimiento no encontrado")
+			return
+		}
+		RespondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-
-	actualizado, encontrado := s.Storage.ActualizarMantenimiento(id, datos)
-
-	if !encontrado {
-		RespondError(w, http.StatusNotFound, "mantenimiento preventivo no encontrado")
-		return
-	}
-
 	RespondJSON(w, http.StatusOK, actualizado)
 }
 
-// BorrarMantenimiento elimina un mantenimiento por su ID..
 func (s *PreventivoServer) BorrarMantenimiento(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
 		return
 	}
-
-	if !s.Storage.BorrarMantenimiento(id) {
-		RespondError(w, http.StatusNotFound, "mantenimiento preventivo no encontrado")
+	if err := s.Mantenimiento.Borrar(id); err != nil {
+		RespondError(w, http.StatusNotFound, "mantenimiento no encontrado")
 		return
 	}
+	RespondJSON(w, http.StatusNoContent, nil)
+}
 
+// =========================================================
+// TAREAS (directo al storage)
+// =========================================================
+
+func (s *PreventivoServer) ListarTareas(w http.ResponseWriter, r *http.Request) {
+	RespondJSON(w, http.StatusOK, s.Storage.ListarTareas())
+}
+
+func (s *PreventivoServer) ObtenerTarea(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
+		return
+	}
+	tarea, encontrado := s.Storage.BuscarTareaPorID(id)
+	if !encontrado {
+		RespondError(w, http.StatusNotFound, "tarea no encontrada")
+		return
+	}
+	RespondJSON(w, http.StatusOK, tarea)
+}
+
+func (s *PreventivoServer) CrearTarea(w http.ResponseWriter, r *http.Request) {
+	var nueva models.TareaPreventiva
+	if err := json.NewDecoder(r.Body).Decode(&nueva); err != nil {
+		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
+		return
+	}
+	if strings.TrimSpace(nueva.Descripcion) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo descripcion es obligatorio")
+		return
+	}
+	if nueva.MantenimientoPreventivoID == 0 {
+		RespondError(w, http.StatusBadRequest, "el campo mantenimiento_preventivo_id es obligatorio")
+		return
+	}
+	RespondJSON(w, http.StatusCreated, s.Storage.CrearTarea(nueva))
+}
+
+func (s *PreventivoServer) ActualizarTarea(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
+		return
+	}
+	var datos models.TareaPreventiva
+	if err := json.NewDecoder(r.Body).Decode(&datos); err != nil {
+		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
+		return
+	}
+	actualizada, encontrado := s.Storage.ActualizarTarea(id, datos)
+	if !encontrado {
+		RespondError(w, http.StatusNotFound, "tarea no encontrada")
+		return
+	}
+	RespondJSON(w, http.StatusOK, actualizada)
+}
+
+func (s *PreventivoServer) BorrarTarea(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
+		return
+	}
+	if !s.Storage.BorrarTarea(id) {
+		RespondError(w, http.StatusNotFound, "tarea no encontrada")
+		return
+	}
+	RespondJSON(w, http.StatusNoContent, nil)
+}
+
+// =========================================================
+// INSUMOS (directo al storage)
+// =========================================================
+
+func (s *PreventivoServer) ListarInsumos(w http.ResponseWriter, r *http.Request) {
+	RespondJSON(w, http.StatusOK, s.Storage.ListarInsumos())
+}
+
+func (s *PreventivoServer) ObtenerInsumo(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
+		return
+	}
+	insumo, encontrado := s.Storage.BuscarInsumoPorID(id)
+	if !encontrado {
+		RespondError(w, http.StatusNotFound, "insumo no encontrado")
+		return
+	}
+	RespondJSON(w, http.StatusOK, insumo)
+}
+
+func (s *PreventivoServer) CrearInsumo(w http.ResponseWriter, r *http.Request) {
+	var nuevo models.InsumoPreventivo
+	if err := json.NewDecoder(r.Body).Decode(&nuevo); err != nil {
+		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
+		return
+	}
+	if strings.TrimSpace(nuevo.Nombre) == "" {
+		RespondError(w, http.StatusBadRequest, "el campo nombre es obligatorio")
+		return
+	}
+	if nuevo.MantenimientoPreventivoID == 0 {
+		RespondError(w, http.StatusBadRequest, "el campo mantenimiento_preventivo_id es obligatorio")
+		return
+	}
+	RespondJSON(w, http.StatusCreated, s.Storage.CrearInsumo(nuevo))
+}
+
+func (s *PreventivoServer) ActualizarInsumo(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
+		return
+	}
+	var datos models.InsumoPreventivo
+	if err := json.NewDecoder(r.Body).Decode(&datos); err != nil {
+		RespondError(w, http.StatusBadRequest, "JSON inválido: "+err.Error())
+		return
+	}
+	actualizado, encontrado := s.Storage.ActualizarInsumo(id, datos)
+	if !encontrado {
+		RespondError(w, http.StatusNotFound, "insumo no encontrado")
+		return
+	}
+	RespondJSON(w, http.StatusOK, actualizado)
+}
+
+func (s *PreventivoServer) BorrarInsumo(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		RespondError(w, http.StatusBadRequest, "id debe ser un número entero")
+		return
+	}
+	if !s.Storage.BorrarInsumo(id) {
+		RespondError(w, http.StatusNotFound, "insumo no encontrado")
+		return
+	}
 	RespondJSON(w, http.StatusNoContent, nil)
 }

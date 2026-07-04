@@ -85,3 +85,40 @@ type SuscripcionesRepository interface {
 
 var _ SuscripcionesRepository = (*MemoriaSuscripciones)(nil)
 var _ SuscripcionesRepository = (*SuscripcionesGORM)(nil)
+
+// =========================================================
+// MÓDULO PREVENTIVO
+// =========================================================
+
+type MantenimientoPreventivoRepository interface {
+	ListarMantenimientos() []models.MantenimientoPreventivo
+	BuscarMantenimientoPorID(id int) (models.MantenimientoPreventivo, bool)
+	CrearMantenimiento(mant models.MantenimientoPreventivo) models.MantenimientoPreventivo
+	ActualizarMantenimiento(id int, datos models.MantenimientoPreventivo) (models.MantenimientoPreventivo, bool)
+	BorrarMantenimiento(id int) bool
+}
+
+type TareaPreventivaRepository interface {
+	ListarTareas() []models.TareaPreventiva
+	BuscarTareaPorID(id int) (models.TareaPreventiva, bool)
+	CrearTarea(t models.TareaPreventiva) models.TareaPreventiva
+	ActualizarTarea(id int, datos models.TareaPreventiva) (models.TareaPreventiva, bool)
+	BorrarTarea(id int) bool
+}
+
+type InsumoPreventivoRepository interface {
+	ListarInsumos() []models.InsumoPreventivo
+	BuscarInsumoPorID(id int) (models.InsumoPreventivo, bool)
+	CrearInsumo(ins models.InsumoPreventivo) models.InsumoPreventivo
+	ActualizarInsumo(id int, datos models.InsumoPreventivo) (models.InsumoPreventivo, bool)
+	BorrarInsumo(id int) bool
+}
+
+type PreventivoRepository interface {
+	MantenimientoPreventivoRepository
+	TareaPreventivaRepository
+	InsumoPreventivoRepository
+}
+
+var _ PreventivoRepository = (*MemoriaPreventivo)(nil)
+var _ PreventivoRepository = (*PreventivoGORM)(nil)

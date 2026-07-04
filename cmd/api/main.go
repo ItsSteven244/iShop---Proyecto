@@ -30,6 +30,9 @@ func main() {
 		&models.ServicioDigital{},
 		&models.SuscripcionCliente{},
 		&models.AccesoDigital{},
+		&models.MantenimientoPreventivo{},
+		&models.TareaPreventiva{},
+		&models.InsumoPreventivo{},
 	); err != nil {
 		log.Fatal("falló AutoMigrate: ", err)
 	}
@@ -38,6 +41,7 @@ func main() {
 	correctivoRepo := storage.NuevoCorrectivoGORM(db)
 	usuarioRepo := storage.NewUsuarioGORM(db)
 	suscripcionesRepo := storage.NuevoSuscripcionesGORM(db)
+	preventivoRepo := storage.NuevoPreventivoGORM(db)
 
 	// 3. Crear los servicios.
 	ordenService := service.NewOrdenCorrectivaService(correctivoRepo)
@@ -45,6 +49,7 @@ func main() {
 	evidenciaService := service.NewEvidenciaDanioService(correctivoRepo)
 	authService := service.NewAuthService(usuarioRepo)
 	servicioDigitalService := service.NewServicioDigitalService(suscripcionesRepo)
+	mantenimientoService := service.NewMantenimientoPreventivoService(preventivoRepo)
 
 	// 4. Crear el servidor con inyección de dependencias.
 	servidor := handlers.NewServer(ordenService, procesoService, evidenciaService, authService)
@@ -85,7 +90,8 @@ func main() {
 			r.Put("/correctivos/evidencias/{id}", servidor.ActualizarEvidencia)
 			r.Delete("/correctivos/evidencias/{id}", servidor.BorrarEvidencia)
 
-			// Módulo Preventivo - compañero agrega sus rutas aquí
+			// Módulo Preventivo
+			r.Mount("/", handlers.PreventivoRouter(preventivoRepo, mantenimientoService))
 
 			// Módulo Suscripciones
 			r.Mount("/", handlers.SuscripcionesRouter(suscripcionesRepo, servicioDigitalService))
