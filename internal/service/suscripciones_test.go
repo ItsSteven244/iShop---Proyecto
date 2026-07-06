@@ -45,6 +45,6 @@ func TestServicioDigitalService_Crear_PrecioInvalido(t *testing.T) {
 		Precio: 0,
 	})
 
-	require.ErrorIs(t, err, service.ErrNombreServicioVacio)
+	require.ErrorIs(t, err, service.ErrPrecioInvalido)
 	repo.AssertNotCalled(t, "CrearServicio")
 }
