@@ -18,7 +18,7 @@ func (s *ServicioDigitalService) Listar() []models.ServicioDigital {
 }
 
 func (s *ServicioDigitalService) Obtener(id int) (models.ServicioDigital, error) {
-	servicio, ok := s.repo.BuscarServicioPorID(id)
+	servicioX, ok := s.repo.BuscarServicioPorID(id)
 	if !ok {
 		return models.ServicioDigital{}, ErrNoEncontrado
 	}
