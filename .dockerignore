@@ -1,0 +1,8 @@
+.git
+.gitignore
+.github
+README.md
+coverage
+ishop.db
+.vscode
+.idea

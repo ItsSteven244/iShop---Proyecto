@@ -23,9 +23,11 @@ func NewSuscripcionesServer(s storage.SuscripcionesRepository, servicios *servic
 	return &SuscripcionesServer{Storage: s, Servicios: servicios}
 }
 
-func SuscripcionesRouter(store storage.SuscripcionesRepository, servicios *service.ServicioDigitalService) http.Handler {
+// SuscripcionesRoutes registra las rutas del módulo Suscripciones directamente
+// sobre el router recibido (r), en vez de crear un sub-router propio.
+// Esto evita el conflicto de chi al montar dos handlers en el mismo path "/".
+func SuscripcionesRoutes(r chi.Router, store storage.SuscripcionesRepository, servicios *service.ServicioDigitalService) {
 	s := NewSuscripcionesServer(store, servicios)
-	r := chi.NewRouter()
 
 	r.Get("/servicios", s.ListarServicios)
 	r.Post("/servicios", s.CrearServicio)
@@ -44,8 +46,6 @@ func SuscripcionesRouter(store storage.SuscripcionesRepository, servicios *servi
 	r.Get("/accesos/{id}", s.ObtenerAcceso)
 	r.Put("/accesos/{id}", s.ActualizarAcceso)
 	r.Delete("/accesos/{id}", s.BorrarAcceso)
-
-	return r
 }
 
 func (s *SuscripcionesServer) ListarServicios(w http.ResponseWriter, r *http.Request) {

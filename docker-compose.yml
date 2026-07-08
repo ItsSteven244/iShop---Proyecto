@@ -1,0 +1,31 @@
+services:
+  api:
+    build: .
+    container_name: ishop-api
+    ports:
+      - "8080:8080"
+    environment:
+      DB_DRIVER: postgres
+      DATABASE_URL: "host=db user=ishop password=ishop dbname=ishop port=5432 sslmode=disable"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: ishop-db
+    environment:
+      POSTGRES_USER: ishop
+      POSTGRES_PASSWORD: ishop
+      POSTGRES_DB: ishop
+    volumes:
+      - ishop-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ishop -d ishop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ishop-db-data:

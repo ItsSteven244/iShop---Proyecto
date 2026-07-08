@@ -23,9 +23,11 @@ func NewPreventivoServer(s storage.PreventivoRepository, mantenimiento *service.
 	return &PreventivoServer{Storage: s, Mantenimiento: mantenimiento}
 }
 
-func PreventivoRouter(store storage.PreventivoRepository, mantenimiento *service.MantenimientoPreventivoService) http.Handler {
+// PreventivoRoutes registra las rutas del módulo Preventivo directamente
+// sobre el router recibido (r), en vez de crear un sub-router propio.
+// Esto evita el conflicto de chi al montar dos handlers en el mismo path "/".
+func PreventivoRoutes(r chi.Router, store storage.PreventivoRepository, mantenimiento *service.MantenimientoPreventivoService) {
 	s := NewPreventivoServer(store, mantenimiento)
-	r := chi.NewRouter()
 
 	r.Get("/mantenimientos", s.ListarMantenimientos)
 	r.Post("/mantenimientos", s.CrearMantenimiento)
@@ -44,8 +46,6 @@ func PreventivoRouter(store storage.PreventivoRepository, mantenimiento *service
 	r.Get("/insumos/{id}", s.ObtenerInsumo)
 	r.Put("/insumos/{id}", s.ActualizarInsumo)
 	r.Delete("/insumos/{id}", s.BorrarInsumo)
-
-	return r
 }
 
 // =========================================================

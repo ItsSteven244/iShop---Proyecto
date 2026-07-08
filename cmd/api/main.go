@@ -3,10 +3,12 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/glebarez/sqlite"
 	"github.com/go-chi/chi/v5"
 	chimw "github.com/go-chi/chi/v5/middleware"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/ItsSteven244/iShop---Proyecto/internal/handlers"
@@ -17,11 +19,23 @@ import (
 )
 
 func main() {
-	// 1. Abrir la base de datos SQLite con GORM y migrar los modelos.
-	db, err := gorm.Open(sqlite.Open("ishop.db"), &gorm.Config{})
+	// 1. Abrir la base de datos y migrar los modelos.
+	//    DB_DRIVER=postgres -> usa PostgreSQL (Docker).
+	//    Sin DB_DRIVER (o cualquier otro valor) -> usa SQLite (desarrollo local).
+	var db *gorm.DB
+	var err error
+
+	switch os.Getenv("DB_DRIVER") {
+	case "postgres":
+		dsn := os.Getenv("DATABASE_URL")
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	default: // sqlite
+		db, err = gorm.Open(sqlite.Open("ishop.db"), &gorm.Config{})
+	}
 	if err != nil {
 		log.Fatal("no se pudo abrir la base de datos: ", err)
 	}
+
 	if err := db.AutoMigrate(
 		&models.OrdenCorrectiva{},
 		&models.ProcesoReparacion{},
@@ -91,10 +105,10 @@ func main() {
 			r.Delete("/correctivos/evidencias/{id}", servidor.BorrarEvidencia)
 
 			// Módulo Preventivo
-			r.Mount("/", handlers.PreventivoRouter(preventivoRepo, mantenimientoService))
+			handlers.PreventivoRoutes(r, preventivoRepo, mantenimientoService)
 
 			// Módulo Suscripciones
-			r.Mount("/", handlers.SuscripcionesRouter(suscripcionesRepo, servicioDigitalService))
+			handlers.SuscripcionesRoutes(r, suscripcionesRepo, servicioDigitalService)
 		})
 	})
 
