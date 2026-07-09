@@ -63,10 +63,18 @@ func main() {
 	evidenciaService := service.NewEvidenciaDanioService(correctivoRepo)
 	authService := service.NewAuthService(usuarioRepo)
 	servicioDigitalService := service.NewServicioDigitalService(suscripcionesRepo)
+	suscripcionClienteService := service.NewSuscripcionClienteService(suscripcionesRepo)
+	accesoDigitalService := service.NewAccesoDigitalService(suscripcionesRepo)
 	mantenimientoService := service.NewMantenimientoPreventivoService(preventivoRepo)
+	tareaService := service.NewTareaPreventivaService(preventivoRepo)
+	insumoService := service.NewInsumoPreventivoService(preventivoRepo)
 
 	// 4. Crear el servidor con inyección de dependencias.
-	servidor := handlers.NewServer(ordenService, procesoService, evidenciaService, authService)
+	servidor := handlers.NewServer(
+		ordenService, procesoService, evidenciaService, authService,
+		servicioDigitalService, suscripcionClienteService, accesoDigitalService,
+		mantenimientoService, tareaService, insumoService,
+	)
 
 	// 5. Configurar el router principal.
 	r := chi.NewRouter()
@@ -105,10 +113,42 @@ func main() {
 			r.Delete("/correctivos/evidencias/{id}", servidor.BorrarEvidencia)
 
 			// Módulo Preventivo
-			handlers.PreventivoRoutes(r, preventivoRepo, mantenimientoService)
+			r.Get("/mantenimientos", servidor.ListarMantenimientos)
+			r.Post("/mantenimientos", servidor.CrearMantenimiento)
+			r.Get("/mantenimientos/{id}", servidor.ObtenerMantenimiento)
+			r.Put("/mantenimientos/{id}", servidor.ActualizarMantenimiento)
+			r.Delete("/mantenimientos/{id}", servidor.BorrarMantenimiento)
+
+			r.Get("/tareas", servidor.ListarTareas)
+			r.Post("/tareas", servidor.CrearTarea)
+			r.Get("/tareas/{id}", servidor.ObtenerTarea)
+			r.Put("/tareas/{id}", servidor.ActualizarTarea)
+			r.Delete("/tareas/{id}", servidor.BorrarTarea)
+
+			r.Get("/insumos", servidor.ListarInsumos)
+			r.Post("/insumos", servidor.CrearInsumo)
+			r.Get("/insumos/{id}", servidor.ObtenerInsumo)
+			r.Put("/insumos/{id}", servidor.ActualizarInsumo)
+			r.Delete("/insumos/{id}", servidor.BorrarInsumo)
 
 			// Módulo Suscripciones
-			handlers.SuscripcionesRoutes(r, suscripcionesRepo, servicioDigitalService)
+			r.Get("/servicios", servidor.ListarServicios)
+			r.Post("/servicios", servidor.CrearServicio)
+			r.Get("/servicios/{id}", servidor.ObtenerServicio)
+			r.Put("/servicios/{id}", servidor.ActualizarServicio)
+			r.Delete("/servicios/{id}", servidor.BorrarServicio)
+
+			r.Get("/suscripciones", servidor.ListarSuscripciones)
+			r.Post("/suscripciones", servidor.CrearSuscripcion)
+			r.Get("/suscripciones/{id}", servidor.ObtenerSuscripcion)
+			r.Put("/suscripciones/{id}", servidor.ActualizarSuscripcion)
+			r.Delete("/suscripciones/{id}", servidor.BorrarSuscripcion)
+
+			r.Get("/accesos", servidor.ListarAccesos)
+			r.Post("/accesos", servidor.CrearAcceso)
+			r.Get("/accesos/{id}", servidor.ObtenerAcceso)
+			r.Put("/accesos/{id}", servidor.ActualizarAcceso)
+			r.Delete("/accesos/{id}", servidor.BorrarAcceso)
 		})
 	})
 

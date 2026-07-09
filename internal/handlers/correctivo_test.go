@@ -94,7 +94,7 @@ func TestHandler_CrearOrden_Exitoso(t *testing.T) {
 	usuarioRepo := &fakeUsuarioRepo{}
 	authSvc := service.NewAuthService(usuarioRepo)
 
-	servidor := handlers.NewServer(ordenSvc, nil, nil, authSvc)
+	servidor := handlers.NewServer(ordenSvc, nil, nil, authSvc, nil, nil, nil, nil, nil, nil)
 	router := setupRouter(servidor, authSvc)
 
 	// Generar token válido
@@ -128,7 +128,7 @@ func TestHandler_ListarOrdenes_SinToken_401(t *testing.T) {
 	usuarioRepo := &fakeUsuarioRepo{}
 	authSvc := service.NewAuthService(usuarioRepo)
 
-	servidor := handlers.NewServer(ordenSvc, nil, nil, authSvc)
+	servidor := handlers.NewServer(ordenSvc, nil, nil, authSvc, nil, nil, nil, nil, nil, nil)
 	router := setupRouter(servidor, authSvc)
 
 	// Ejecutar — sin token

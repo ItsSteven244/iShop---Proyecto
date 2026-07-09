@@ -18,6 +18,7 @@ import (
 	"github.com/ItsSteven244/iShop---Proyecto/internal/service"
 )
 
+// fakeServicioRepo es un fake en memoria para los tests de handler.
 type fakeServicioRepo struct {
 	servicios []models.ServicioDigital
 	nextID    int
@@ -46,14 +47,15 @@ func (f *fakeServicioRepo) ActualizarServicio(id int, datos models.ServicioDigit
 }
 func (f *fakeServicioRepo) BorrarServicio(id int) bool { return false }
 
-func setupRouterServicios(servicioSvc *service.ServicioDigitalService, authSvc *service.AuthService) http.Handler {
+// setupRouterServicios arma el router con middleware de auth para los tests.
+func setupRouterServicios(s *handlers.Server, authSvc *service.AuthService) http.Handler {
 	r := chi.NewRouter()
 	r.Use(chimw.Recoverer)
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Group(func(r chi.Router) {
 			r.Use(middleware.Auth(authSvc))
-			r.Get("/servicios", handlers.NewSuscripcionesServer(nil, servicioSvc).ListarServicios)
-			r.Post("/servicios", handlers.NewSuscripcionesServer(nil, servicioSvc).CrearServicio)
+			r.Get("/servicios", s.ListarServicios)
+			r.Post("/servicios", s.CrearServicio)
 		})
 	})
 	return r
@@ -65,7 +67,8 @@ func TestHandler_CrearServicio_Exitoso(t *testing.T) {
 	usuarioRepo := &fakeUsuarioRepo{}
 	authSvc := service.NewAuthService(usuarioRepo)
 
-	router := setupRouterServicios(servicioSvc, authSvc)
+	servidor := handlers.NewServer(nil, nil, nil, authSvc, servicioSvc, nil, nil, nil, nil, nil)
+	router := setupRouterServicios(servidor, authSvc)
 
 	usuario, _ := authSvc.Registrar("servicios@test.com", "123456")
 	token, _ := authSvc.GenerarToken(usuario)
@@ -93,7 +96,8 @@ func TestHandler_ListarServicios_SinToken_401(t *testing.T) {
 	usuarioRepo := &fakeUsuarioRepo{}
 	authSvc := service.NewAuthService(usuarioRepo)
 
-	router := setupRouterServicios(servicioSvc, authSvc)
+	servidor := handlers.NewServer(nil, nil, nil, authSvc, servicioSvc, nil, nil, nil, nil, nil)
+	router := setupRouterServicios(servidor, authSvc)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/servicios", nil)
 	rec := httptest.NewRecorder()

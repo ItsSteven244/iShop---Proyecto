@@ -48,14 +48,14 @@ func (f *fakeMantenimientoRepo) ActualizarMantenimiento(id int, datos models.Man
 }
 func (f *fakeMantenimientoRepo) BorrarMantenimiento(id int) bool { return false }
 
-func setupRouterMantenimientos(mantSvc *service.MantenimientoPreventivoService, authSvc *service.AuthService) http.Handler {
+func setupRouterMantenimientos(s *handlers.Server, authSvc *service.AuthService) http.Handler {
 	r := chi.NewRouter()
 	r.Use(chimw.Recoverer)
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Group(func(r chi.Router) {
 			r.Use(middleware.Auth(authSvc))
-			r.Get("/mantenimientos", handlers.NewPreventivoServer(nil, mantSvc).ListarMantenimientos)
-			r.Post("/mantenimientos", handlers.NewPreventivoServer(nil, mantSvc).CrearMantenimiento)
+			r.Get("/mantenimientos", s.ListarMantenimientos)
+			r.Post("/mantenimientos", s.CrearMantenimiento)
 		})
 	})
 	return r
@@ -67,7 +67,8 @@ func TestHandler_CrearMantenimiento_Exitoso(t *testing.T) {
 	usuarioRepo := &fakeUsuarioRepo{}
 	authSvc := service.NewAuthService(usuarioRepo)
 
-	router := setupRouterMantenimientos(mantSvc, authSvc)
+	servidor := handlers.NewServer(nil, nil, nil, authSvc, nil, nil, nil, mantSvc, nil, nil)
+	router := setupRouterMantenimientos(servidor, authSvc)
 
 	usuario, _ := authSvc.Registrar("preventivo@test.com", "123456")
 	token, _ := authSvc.GenerarToken(usuario)
@@ -95,7 +96,8 @@ func TestHandler_ListarMantenimientos_SinToken_401(t *testing.T) {
 	usuarioRepo := &fakeUsuarioRepo{}
 	authSvc := service.NewAuthService(usuarioRepo)
 
-	router := setupRouterMantenimientos(mantSvc, authSvc)
+	servidor := handlers.NewServer(nil, nil, nil, authSvc, nil, nil, nil, mantSvc, nil, nil)
+	router := setupRouterMantenimientos(servidor, authSvc)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/mantenimientos", nil)
 	rec := httptest.NewRecorder()
