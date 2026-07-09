@@ -55,4 +55,20 @@ func TestCorrectivoGORM_CrearOrden_Refleja(t *testing.T) {
 	require.Len(t, lista, 1)
 }
 
-//...
+// =========================================================
+// TEST 5 — REPOSITORIO GORM: BUSCAR ORDEN INEXISTENTE
+// =========================================================
+
+// TestCorrectivoGORM_BuscarOrdenPorID_NoExiste prueba que buscar una orden
+// con un ID que no existe en la base retorna ok=false, sin panics ni errores.
+func TestCorrectivoGORM_BuscarOrdenPorID_NoExiste(t *testing.T) {
+	// Preparar — base vacía, sin ninguna orden creada
+	db := abrirDBMemoria(t)
+	repo := storage.NuevoCorrectivoGORM(db)
+
+	// Ejecutar — buscamos un ID que nunca se creó
+	_, ok := repo.BuscarOrdenPorID(999)
+
+	// Verificar — debe indicar que no se encontró
+	require.False(t, ok)
+}
