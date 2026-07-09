@@ -20,6 +20,10 @@ func abrirDBMemoriaSuscripciones(t *testing.T) *gorm.DB {
 	return db
 }
 
+// =========================================================
+// TEST 1 — REPOSITORIO GORM CON :memory:
+// =========================================================
+
 func TestSuscripcionesGORM_CrearServicio_Refleja(t *testing.T) {
 	db := abrirDBMemoriaSuscripciones(t)
 	repo := storage.NuevoSuscripcionesGORM(db)
@@ -44,4 +48,20 @@ func TestSuscripcionesGORM_CrearServicio_Refleja(t *testing.T) {
 
 	lista := repo.ListarServicios()
 	require.Len(t, lista, 1)
+}
+
+// =========================================================
+// TEST 2 — REPOSITORIO GORM: BUSCAR SERVICIO INEXISTENTE
+// =========================================================
+
+func TestSuscripcionesGORM_BuscarServicioPorID_NoExiste(t *testing.T) {
+	// Preparar — base vacía, sin ningún servicio creado
+	db := abrirDBMemoriaSuscripciones(t)
+	repo := storage.NuevoSuscripcionesGORM(db)
+
+	// Ejecutar — buscamos un ID que nunca se creó
+	_, ok := repo.BuscarServicioPorID(999)
+
+	// Verificar — debe indicar que no se encontró
+	require.False(t, ok)
 }

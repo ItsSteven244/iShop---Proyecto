@@ -20,6 +20,10 @@ func abrirDBMemoriaPreventivo(t *testing.T) *gorm.DB {
 	return db
 }
 
+// =========================================================
+// TEST 1 — REPOSITORIO GORM CON :memory:
+// =========================================================
+
 func TestPreventivoGORM_CrearMantenimiento_Refleja(t *testing.T) {
 	db := abrirDBMemoriaPreventivo(t)
 	repo := storage.NuevoPreventivoGORM(db)
@@ -44,4 +48,20 @@ func TestPreventivoGORM_CrearMantenimiento_Refleja(t *testing.T) {
 
 	lista := repo.ListarMantenimientos()
 	require.Len(t, lista, 1)
+}
+
+// =========================================================
+// TEST 2 — REPOSITORIO GORM: BUSCAR MANTENIMIENTO INEXISTENTE
+// =========================================================
+
+func TestPreventivoGORM_BuscarMantenimientoPorID_NoExiste(t *testing.T) {
+	// Preparar — base vacía, sin ningún mantenimiento creado
+	db := abrirDBMemoriaPreventivo(t)
+	repo := storage.NuevoPreventivoGORM(db)
+
+	// Ejecutar — buscamos un ID que nunca se creó
+	_, ok := repo.BuscarMantenimientoPorID(999)
+
+	// Verificar — debe indicar que no se encontró
+	require.False(t, ok)
 }
