@@ -62,7 +62,7 @@ func TestOrdenService_Crear_CodigoVacio(t *testing.T) {
 	})
 
 	// Verificar
-	require.ErrorIs(t, err, service.ErrCodigoVacio)
+	require.ErrorIs(t, err, service.ErrProblemaVacio)
 	repo.AssertNotCalled(t, "CrearOrden")
 }
 
