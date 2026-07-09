@@ -14,6 +14,7 @@ import (
 	"github.com/ItsSteven244/iShop---Proyecto/internal/handlers"
 	"github.com/ItsSteven244/iShop---Proyecto/internal/middleware"
 	"github.com/ItsSteven244/iShop---Proyecto/internal/models"
+	"github.com/ItsSteven244/iShop---Proyecto/internal/seed"
 	"github.com/ItsSteven244/iShop---Proyecto/internal/service"
 	"github.com/ItsSteven244/iShop---Proyecto/internal/storage"
 )
@@ -49,6 +50,11 @@ func main() {
 		&models.InsumoPreventivo{},
 	); err != nil {
 		log.Fatal("falló AutoMigrate: ", err)
+	}
+
+	// 1.5. Sembrar datos de ejemplo si la base está vacía.
+	if err := seed.Ejecutar(db); err != nil {
+		log.Fatal("falló el seed: ", err)
 	}
 
 	// 2. Crear los repositorios GORM.
