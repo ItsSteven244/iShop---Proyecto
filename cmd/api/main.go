@@ -92,63 +92,66 @@ func main() {
 		r.Group(func(r chi.Router) {
 			r.Use(middleware.Auth(authService))
 
+			// Solo admin puede borrar (aplica a todos los DELETE de abajo).
+			soloAdmin := middleware.RequireRol("admin")
+
 			// Módulo Correctivo
 			r.Get("/correctivos/ordenes", servidor.ListarOrdenes)
 			r.Post("/correctivos/ordenes", servidor.CrearOrden)
 			r.Get("/correctivos/ordenes/{id}", servidor.ObtenerOrden)
 			r.Put("/correctivos/ordenes/{id}", servidor.ActualizarOrden)
 			r.Patch("/correctivos/ordenes/{id}", servidor.ActualizarEstadoOrden)
-			r.Delete("/correctivos/ordenes/{id}", servidor.BorrarOrden)
+			r.With(soloAdmin).Delete("/correctivos/ordenes/{id}", servidor.BorrarOrden)
 
 			r.Get("/correctivos/procesos", servidor.ListarProcesos)
 			r.Post("/correctivos/procesos", servidor.CrearProceso)
 			r.Get("/correctivos/procesos/{id}", servidor.ObtenerProceso)
 			r.Put("/correctivos/procesos/{id}", servidor.ActualizarProceso)
-			r.Delete("/correctivos/procesos/{id}", servidor.BorrarProceso)
+			r.With(soloAdmin).Delete("/correctivos/procesos/{id}", servidor.BorrarProceso)
 
 			r.Get("/correctivos/evidencias", servidor.ListarEvidencias)
 			r.Post("/correctivos/evidencias", servidor.CrearEvidencia)
 			r.Get("/correctivos/evidencias/{id}", servidor.ObtenerEvidencia)
 			r.Put("/correctivos/evidencias/{id}", servidor.ActualizarEvidencia)
-			r.Delete("/correctivos/evidencias/{id}", servidor.BorrarEvidencia)
+			r.With(soloAdmin).Delete("/correctivos/evidencias/{id}", servidor.BorrarEvidencia)
 
 			// Módulo Preventivo
 			r.Get("/mantenimientos", servidor.ListarMantenimientos)
 			r.Post("/mantenimientos", servidor.CrearMantenimiento)
 			r.Get("/mantenimientos/{id}", servidor.ObtenerMantenimiento)
 			r.Put("/mantenimientos/{id}", servidor.ActualizarMantenimiento)
-			r.Delete("/mantenimientos/{id}", servidor.BorrarMantenimiento)
+			r.With(soloAdmin).Delete("/mantenimientos/{id}", servidor.BorrarMantenimiento)
 
 			r.Get("/tareas", servidor.ListarTareas)
 			r.Post("/tareas", servidor.CrearTarea)
 			r.Get("/tareas/{id}", servidor.ObtenerTarea)
 			r.Put("/tareas/{id}", servidor.ActualizarTarea)
-			r.Delete("/tareas/{id}", servidor.BorrarTarea)
+			r.With(soloAdmin).Delete("/tareas/{id}", servidor.BorrarTarea)
 
 			r.Get("/insumos", servidor.ListarInsumos)
 			r.Post("/insumos", servidor.CrearInsumo)
 			r.Get("/insumos/{id}", servidor.ObtenerInsumo)
 			r.Put("/insumos/{id}", servidor.ActualizarInsumo)
-			r.Delete("/insumos/{id}", servidor.BorrarInsumo)
+			r.With(soloAdmin).Delete("/insumos/{id}", servidor.BorrarInsumo)
 
 			// Módulo Suscripciones
 			r.Get("/servicios", servidor.ListarServicios)
 			r.Post("/servicios", servidor.CrearServicio)
 			r.Get("/servicios/{id}", servidor.ObtenerServicio)
 			r.Put("/servicios/{id}", servidor.ActualizarServicio)
-			r.Delete("/servicios/{id}", servidor.BorrarServicio)
+			r.With(soloAdmin).Delete("/servicios/{id}", servidor.BorrarServicio)
 
 			r.Get("/suscripciones", servidor.ListarSuscripciones)
 			r.Post("/suscripciones", servidor.CrearSuscripcion)
 			r.Get("/suscripciones/{id}", servidor.ObtenerSuscripcion)
 			r.Put("/suscripciones/{id}", servidor.ActualizarSuscripcion)
-			r.Delete("/suscripciones/{id}", servidor.BorrarSuscripcion)
+			r.With(soloAdmin).Delete("/suscripciones/{id}", servidor.BorrarSuscripcion)
 
 			r.Get("/accesos", servidor.ListarAccesos)
 			r.Post("/accesos", servidor.CrearAcceso)
 			r.Get("/accesos/{id}", servidor.ObtenerAcceso)
 			r.Put("/accesos/{id}", servidor.ActualizarAcceso)
-			r.Delete("/accesos/{id}", servidor.BorrarAcceso)
+			r.With(soloAdmin).Delete("/accesos/{id}", servidor.BorrarAcceso)
 		})
 	})
 

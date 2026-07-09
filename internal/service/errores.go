@@ -12,6 +12,7 @@ var (
 	ErrTokenInvalido         = errors.New("token inexistente o invalido")
 	ErrEmailEnUso            = errors.New("email ya en uso")
 	ErrCredencialesInvalidas = errors.New("email o contraseña incorrectos")
+	ErrRolInvalido           = errors.New("el rol debe ser 'admin' o 'tecnico'")
 	ErrNombreServicioVacio   = errors.New("el campo nombre es obligatorio")
 	ErrPrecioInvalido        = errors.New("el campo precio debe ser mayor a 0")
 	ErrEquipoVacio           = errors.New("el campo equipo es obligatorio")

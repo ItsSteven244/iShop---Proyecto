@@ -70,7 +70,7 @@ func TestHandler_CrearServicio_Exitoso(t *testing.T) {
 	servidor := handlers.NewServer(nil, nil, nil, authSvc, servicioSvc, nil, nil, nil, nil, nil)
 	router := setupRouterServicios(servidor, authSvc)
 
-	usuario, _ := authSvc.Registrar("servicios@test.com", "123456")
+	usuario, _ := authSvc.Registrar("servicios@test.com", "123456", "tecnico")
 	token, _ := authSvc.GenerarToken(usuario)
 
 	cuerpo, _ := json.Marshal(models.ServicioDigital{

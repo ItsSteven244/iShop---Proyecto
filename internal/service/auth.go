@@ -16,7 +16,8 @@ var secretJWT = []byte("cualquier_cosa_secreta")
 const duracionToken = 24 * time.Hour
 
 type Claims struct {
-	UsuarioID int `json:"usuario_id"`
+	UsuarioID int    `json:"usuario_id"`
+	Rol       string `json:"rol"`
 	jwt.RegisteredClaims
 }
 
@@ -28,11 +29,23 @@ func NewAuthService(repo storage.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) Registrar(email, password string) (models.Usuario, error) {
+func rolValido(rol string) bool {
+	return rol == "admin" || rol == "tecnico"
+}
+
+func (s *AuthService) Registrar(email, password, rol string) (models.Usuario, error) {
 	email = strings.TrimSpace(email)
 	password = strings.TrimSpace(password)
+	rol = strings.TrimSpace(rol)
+
 	if email == "" || password == "" {
 		return models.Usuario{}, ErrCredencialesInvalidas
+	}
+	if rol == "" {
+		rol = "tecnico"
+	}
+	if !rolValido(rol) {
+		return models.Usuario{}, ErrRolInvalido
 	}
 	if _, existe := s.repo.BuscarUsuarioPorEmail(email); existe {
 		return models.Usuario{}, ErrEmailEnUso
@@ -44,6 +57,7 @@ func (s *AuthService) Registrar(email, password string) (models.Usuario, error) 
 	return s.repo.CrearUsuario(models.Usuario{
 		Email:        email,
 		PasswordHash: string(hash),
+		Rol:          rol,
 	})
 }
 
@@ -66,6 +80,7 @@ func (s *AuthService) Login(email, password string) (string, error) {
 func (s *AuthService) GenerarToken(u models.Usuario) (string, error) {
 	claims := &Claims{
 		UsuarioID: u.ID,
+		Rol:       u.Rol,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(duracionToken)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -75,7 +90,8 @@ func (s *AuthService) GenerarToken(u models.Usuario) (string, error) {
 	return token.SignedString(secretJWT)
 }
 
-func (s *AuthService) ValidarToken(token string) (int, error) {
+// ValidarToken devuelve el ID del usuario y su rol si el token es válido.
+func (s *AuthService) ValidarToken(token string) (int, string, error) {
 	parsedToken, err := jwt.ParseWithClaims(token, &Claims{}, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, ErrCredencialesInvalidas
@@ -83,11 +99,11 @@ func (s *AuthService) ValidarToken(token string) (int, error) {
 		return secretJWT, nil
 	})
 	if err != nil || !parsedToken.Valid {
-		return 0, ErrCredencialesInvalidas
+		return 0, "", ErrCredencialesInvalidas
 	}
 	claims, ok := parsedToken.Claims.(*Claims)
 	if !ok {
-		return 0, ErrCredencialesInvalidas
+		return 0, "", ErrCredencialesInvalidas
 	}
-	return claims.UsuarioID, nil
+	return claims.UsuarioID, claims.Rol, nil
 }

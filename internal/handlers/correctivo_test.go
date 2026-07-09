@@ -98,7 +98,7 @@ func TestHandler_CrearOrden_Exitoso(t *testing.T) {
 	router := setupRouter(servidor, authSvc)
 
 	// Generar token válido
-	usuario, _ := authSvc.Registrar("test@test.com", "123456")
+	usuario, _ := authSvc.Registrar("test@test.com", "123456", "tecnico")
 	token, _ := authSvc.GenerarToken(usuario)
 
 	cuerpo, _ := json.Marshal(models.OrdenCorrectiva{

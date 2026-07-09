@@ -70,7 +70,7 @@ func TestHandler_CrearMantenimiento_Exitoso(t *testing.T) {
 	servidor := handlers.NewServer(nil, nil, nil, authSvc, nil, nil, nil, mantSvc, nil, nil)
 	router := setupRouterMantenimientos(servidor, authSvc)
 
-	usuario, _ := authSvc.Registrar("preventivo@test.com", "123456")
+	usuario, _ := authSvc.Registrar("preventivo@test.com", "123456", "tecnico")
 	token, _ := authSvc.GenerarToken(usuario)
 
 	cuerpo, _ := json.Marshal(models.MantenimientoPreventivo{
