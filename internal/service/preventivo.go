@@ -64,7 +64,7 @@ func validarMantenimiento(mant models.MantenimientoPreventivo) error {
 }
 
 // =========================================================
-// TAREA PREVENTIVA
+// TAREA PREVENTIVA.
 // =========================================================
 
 type TareaPreventivaService struct {
