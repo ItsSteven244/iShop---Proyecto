@@ -22,7 +22,7 @@ import (
 func main() {
 	// 1. Abrir la base de datos y migrar los modelos.
 	//    DB_DRIVER=postgres -> usa PostgreSQL (Docker).
-	//    Sin DB_DRIVER (o cualquier otro valor) -> usa SQLite (desarrollo local).
+	//    Sin DB_DRIVER (o cualquier otro valor) -> usa SQLite (desarrollo local)..
 	var db *gorm.DB
 	var err error
 
