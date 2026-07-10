@@ -3,7 +3,7 @@ package storage
 import "github.com/ItsSteven244/iShop---Proyecto/internal/models"
 
 // =========================================================
-// MÓDULO CORRECTIVO
+// MÓDULO CORRECTIVO.
 // =========================================================
 
 type OrdenCorrectivaRepository interface {
