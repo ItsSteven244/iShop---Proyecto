@@ -78,7 +78,7 @@ func TestMantenimientoPreventivoService_Crear_FechaProgramadaVacia(t *testing.T)
 }
 
 // =========================================================
-// TEST 3 — CREAR: caso de éxito
+// TEST 3 — CREAR: caso de éxito.
 // =========================================================
 
 func TestMantenimientoPreventivoService_Crear_Exito(t *testing.T) {
