@@ -10,7 +10,7 @@ type Server struct {
 	Procesos   *service.ProcesoReparacionService
 	Evidencias *service.EvidenciaDanioService
 
-	// Auth
+	// Auth.
 	Auth *service.AuthService
 
 	// Módulo Preventivo
