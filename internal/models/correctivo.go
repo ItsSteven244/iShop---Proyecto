@@ -23,7 +23,7 @@ type ProcesoReparacion struct {
 	Etapa             string `json:"etapa"`
 	Observacion       string `json:"observacion"`
 	Fecha             string `json:"fecha"`
-	OrdenCorrectivaID int    `json:"orden_correctiva_id"`
+	OrdenCorrectivaID int    `json:"orden_correctiva_id" gorm:"index"`
 }
 
 // EvidenciaDanio guarda la descripción o foto del daño que tiene el dispositivo.
@@ -33,5 +33,5 @@ type EvidenciaDanio struct {
 	Descripcion       string `json:"descripcion"`
 	ImagenURL         string `json:"imagen_url"`
 	Fecha             string `json:"fecha"`
-	OrdenCorrectivaID int    `json:"orden_correctiva_id"`
+	OrdenCorrectivaID int    `json:"orden_correctiva_id" gorm:"index"`
 }
