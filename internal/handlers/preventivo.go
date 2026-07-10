@@ -13,7 +13,7 @@ import (
 )
 
 // =========================================================
-// MANTENIMIENTOS
+// MANTENIMIENTOS.
 // =========================================================
 
 func (s *Server) ListarMantenimientos(w http.ResponseWriter, r *http.Request) {

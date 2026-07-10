@@ -7,7 +7,7 @@ import (
 )
 
 // =========================================================
-// MÓDULO CORRECTIVO - Steven
+// MÓDULO CORRECTIVO - Steven.
 // =========================================================
 
 // CorrectivoGORM es la implementación del repositorio correctivo usando GORM + SQLite.
