@@ -26,7 +26,7 @@ var (
 	ErrEstadoVacio                = errors.New("el campo estado es obligatorio")
 	ErrTecnicoIDRequerido         = errors.New("el campo tecnico_id es obligatorio")
 
-	// Suscripciones — AccesoDigital
+	// Suscripciones — AccesoDigital.
 	ErrCorreoAccesoVacio      = errors.New("el campo correo_acceso es obligatorio")
 	ErrPerfilVacio            = errors.New("el campo perfil es obligatorio")
 	ErrSuscripcionIDRequerido = errors.New("el campo suscripcion_cliente_id es obligatorio")
